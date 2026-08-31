@@ -90,7 +90,6 @@ flutter:
     - assets/icons/categories/
     - assets/icons/brands/
     - assets/icons/payment_methods/
-    - assets/images/
     - assets/logos/
   fonts:
     - family: Coolvetica
@@ -123,3 +122,16 @@ flutter:
         - asset: assets/fonts/Poppins-LightItalic.ttf
           weight: 300
           style: italic
+
+flutter_launcher_icons:
+  image_path: "assets/logos/t-store-splash-logo-black.png"
+  android: true
+  ios: true
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: "assets/logos/t-store-splash-logo-black.png"
+  android_12:
+    color: "#ffffff"
+    image: "assets/logos/t-store-splash-logo-black.png"
+  web: false

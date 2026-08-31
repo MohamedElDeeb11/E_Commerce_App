@@ -5,7 +5,8 @@ import 'package:t_store/features/personalization/presentation/views/settings_vie
 import 'package:t_store/features/shop/presentation/views/home_view.dart';
 import 'package:t_store/features/shop/presentation/views/cart_view.dart';
 import 'package:t_store/features/shop/presentation/views/wishlist_view.dart';
-import 'package:t_store/core/utils/localizations/app_localizations.dart'; // استيراد امتداد الترجمة
+import 'package:t_store/features/shop/presentation/views/search_view.dart'; // استيراد شاشة البحث الحقيقية
+import 'package:t_store/core/utils/localizations/app_localizations.dart';
 
 class NavigationMenu extends StatefulWidget {
   const NavigationMenu({super.key});
@@ -17,12 +18,12 @@ class NavigationMenu extends StatefulWidget {
 class _NavigationMenuState extends State<NavigationMenu> {
   int selectedIndex = 0;
 
-  // لستة الشاشات
+  // لستة الشاشات بعد ربط شاشة البحث الحقيقية
   final screens = [
-    const HomeView(), // 0: Home
+    const HomeView(),     // 0: Home
     const WishlistView(), // 1: Wishlist
-    const CartView(), // 2: Cart
-    const Center(child: Text('Search Screen')), // 3: Search
+    const CartView(),     // 2: Cart
+    const SearchView(),   // 3: Search (تم ربطها هنا بنجاح)
     const SettingsView(), // 4: Setting
   ];
 
@@ -38,7 +39,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
           color: dark ? TColors.dark : TColors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),
@@ -50,14 +51,14 @@ class _NavigationMenuState extends State<NavigationMenu> {
             // 1. Home
             _buildNavItem(
               icon: Iconsax.home,
-              label: 'home'.tr(context), // مترجمة
+              label: 'home'.tr(context),
               index: 0,
               dark: dark,
             ),
             // 2. Wishlist
             _buildNavItem(
               icon: Iconsax.heart,
-              label: 'wishlist'.tr(context), // مترجمة
+              label: 'wishlist'.tr(context),
               index: 1,
               dark: dark,
             ),
@@ -74,7 +75,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
+                        color: Colors.black.withValues(alpha: 0.15),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -97,14 +98,14 @@ class _NavigationMenuState extends State<NavigationMenu> {
             // 4. Search
             _buildNavItem(
               icon: Iconsax.search_normal,
-              label: 'search'.tr(context), // مترجمة
+              label: 'search'.tr(context),
               index: 3,
               dark: dark,
             ),
             // 5. Setting
             _buildNavItem(
               icon: Iconsax.setting,
-              label: 'settings'.tr(context), // مترجمة
+              label: 'settings'.tr(context),
               index: 4,
               dark: dark,
             ),

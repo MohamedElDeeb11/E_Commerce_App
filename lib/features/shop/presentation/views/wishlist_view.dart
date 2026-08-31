@@ -94,7 +94,7 @@ class WishlistView extends StatelessWidget {
                                   : Image.network(
                                       item.image,
                                       fit: BoxFit.contain,
-                                      errorBuilder: (_, __, ___) => Image.asset(
+                                      errorBuilder: (_, _, _) => Image.asset(
                                         'assets/images/products/product-shirt.png',
                                       ),
                                     ),

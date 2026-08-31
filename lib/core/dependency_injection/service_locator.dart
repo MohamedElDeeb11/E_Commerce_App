@@ -85,6 +85,7 @@ import 'package:t_store/features/personalization/data/repositories/profile_repos
 import 'package:t_store/features/personalization/domain/repositories/profile_repository.dart';
 import 'package:t_store/features/personalization/domain/usecases/get_profile_usecase.dart';
 import 'package:t_store/features/personalization/domain/usecases/update_profile_usecase.dart';
+import 'package:t_store/features/personalization/domain/usecases/upload_avatar_usecase.dart';
 import 'package:t_store/features/personalization/presentation/cubit/profile_cubit.dart';
 
 // Chat
@@ -284,11 +285,13 @@ Future<void> setupServiceLocator() async {
   // Use Cases
   sl.registerLazySingleton(() => GetProfileUsecase(sl()));
   sl.registerLazySingleton(() => UpdateProfileUsecase(sl()));
+  sl.registerLazySingleton(() => UploadAvatarUsecase(sl()));
 
   // Cubit
   sl.registerFactory(() => ProfileCubit(
         getProfileUsecase: sl(),
         updateProfileUsecase: sl(),
+        uploadAvatarUsecase: sl(),
       ));
 
   // ==================== Chat ====================

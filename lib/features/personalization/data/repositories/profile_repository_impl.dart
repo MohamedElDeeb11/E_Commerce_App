@@ -117,7 +117,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
         return const Left('يرجى تسجيل الدخول أولاً');
       }
 
-      final fileName = 'avatar_$userId.${imageFile.path.split('.').last}';
+      final fileName = 'avatar_${userId}_${DateTime.now().millisecondsSinceEpoch}.${imageFile.path.split('.').last}';
       final bytes = await imageFile.readAsBytes();
 
       await supabaseService.client.storage

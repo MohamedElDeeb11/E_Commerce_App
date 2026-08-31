@@ -1,62 +1,84 @@
 import 'package:flutter/material.dart';
-import 'package:t_store/core/utils/constants/colors.dart'; // ضفنا ملف الألوان هنا
+import 'package:t_store/core/utils/constants/colors.dart';
+import 'package:t_store/core/utils/constants/sizes.dart';
+import 'package:t_store/core/utils/helpers/helper_functions.dart';
+import 'package:t_store/features/shop/presentation/views/sub_category_view.dart';
 
 class HomeCategories extends StatelessWidget {
   const HomeCategories({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // 1. تحديد وضع التطبيق (فاتح ولا مظلم)
-    final dark = Theme.of(context).brightness == Brightness.dark;
+    final dark = THelperFunctions.isDarkMode(context);
 
-    // لستة التصنيفات الحقيقية مع مسارات صورها الصحيحة من المشروع
     final List<Map<String, String>> categories = [
+      {'title': 'Shirts', 'image': 'assets/icons/categories/mens-shirts.png'},
+      {'title': 'Sports', 'image': 'assets/icons/categories/sports-accessories.png'},
       {'title': 'Beauty', 'image': 'assets/icons/categories/beauty.png'},
       {'title': 'Furniture', 'image': 'assets/icons/categories/furniture.png'},
       {'title': 'Laptops', 'image': 'assets/icons/categories/laptops.png'},
-      {'title': 'Smartphones', 'image': 'assets/icons/categories/smartphones.png'},
-      {'title': 'Fashion', 'image': 'assets/icons/categories/mens-shirts.png'},
-      {'title': 'Shoes', 'image': 'assets/icons/categories/mens-shoes.png'},
-      {'title': 'Jewellery', 'image': 'assets/icons/categories/womens-jewellery.png'},
+      {'title': 'Mobiles', 'image': 'assets/icons/categories/smartphones.png'},
     ];
-    
+
     return SizedBox(
-      height: 90,
+      height: 80,
       child: ListView.builder(
-        shrinkWrap: true,
         itemCount: categories.length,
+        shrinkWrap: true,
         scrollDirection: Axis.horizontal,
-        itemBuilder: (_, index) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Column(
-              children: [
-                // دايرة الصورة
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    // 2. تغيير لون الخلفية أوتوماتيك بناءً على الثيم
-                    color: dark ? TColors.darkContainer : Colors.grey[100],
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: AssetImage(categories[index]['image']!),
-                      fit: BoxFit.cover,
-                      // 3. تغيير لون الأيقونة نفسها (أبيض في الدارك مود، أسود في اللايت مود)
-                      colorFilter: dark 
-                          ? const ColorFilter.mode(Colors.white, BlendMode.srcIn)
-                          : const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          return GestureDetector(
+            onTap: () {
+              // تم تعديل التوجيه هنا ليرسل اسم القسم مع الشاشة 👈
+              THelperFunctions.navigateToScreen(
+                context, 
+                SubCategoryView(categoryTitle: category['title']!),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(right: TSizes.spaceBtwItems),
+              child: Column(
+                children: [
+                  Container(
+                    width: 56,
+                    height: 56,
+                    padding: const EdgeInsets.all(TSizes.sm),
+                    decoration: BoxDecoration(
+                      color: dark ? TColors.darkContainer : TColors.light,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: dark ? TColors.darkerGrey : TColors.borderPrimary,
+                      ),
+                    ),
+                    child: Center(
+                      child: Image.asset(
+                        category['image']!,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => const Icon(
+                          Icons.category,
+                          color: TColors.primary,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  categories[index]['title']!,
-                  style: Theme.of(context).textTheme.labelMedium,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                  const SizedBox(height: TSizes.spaceBtwItems / 2),
+                  SizedBox(
+                    width: 55,
+                    child: Text(
+                      category['title']!,
+                      style: TextStyle(
+                        color: dark ? Colors.white : Colors.black,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },

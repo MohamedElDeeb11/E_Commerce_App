@@ -18,7 +18,7 @@ class ProductMetadata extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: TColors.warning.withOpacity(0.8),
+                color: TColors.warning.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(TSizes.cardRadiusSm),
               ),
               child: const Text('25%', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),

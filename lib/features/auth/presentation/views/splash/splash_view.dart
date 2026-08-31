@@ -17,7 +17,7 @@ class _SplashViewState extends State<SplashView> {
   }
 
   // دالة عشان تستنى ثانيتين وبعدين تنقل لصفحة البداية
-  _navigateToHome() async {
+  Future<void> _navigateToHome() async {
     await Future.delayed(const Duration(seconds: 2), () {});
     if (mounted) {
       Navigator.pushReplacement(

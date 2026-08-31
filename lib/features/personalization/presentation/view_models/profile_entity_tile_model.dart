@@ -4,12 +4,13 @@ import 'package:iconsax/iconsax.dart';
 class ProfileEntityTileModel {
   final String title;
   final String value;
-  final void Function()? onTap;
-  final IconData trailing;
-  const ProfileEntityTileModel({
-    required this.value,
+  final IconData? trailing; // السطر ده مهم، ضفنا علامة الاستفهام
+  final VoidCallback onTap;
+
+  ProfileEntityTileModel({
     required this.title,
-    this.trailing = Iconsax.arrow_right_34,
-    this.onTap,
+    required this.value,
+    required this.onTap,
+    this.trailing = Iconsax.arrow_right_3, // القيمة الافتراضية سهم
   });
 }

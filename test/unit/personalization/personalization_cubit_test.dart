@@ -11,6 +11,8 @@ import 'package:t_store/features/personalization/domain/usecases/get_addresses_u
 import 'package:t_store/features/personalization/domain/usecases/add_address_usecase.dart';
 import 'package:t_store/features/personalization/domain/usecases/update_address_usecase.dart';
 import 'package:t_store/features/personalization/domain/usecases/delete_address_usecase.dart';
+// تم إضافة الاستيراد ده 👇
+import 'package:t_store/features/personalization/domain/usecases/upload_avatar_usecase.dart';
 import 'package:t_store/features/personalization/presentation/cubit/profile_cubit.dart';
 import 'package:t_store/features/personalization/presentation/cubit/profile_state.dart';
 import 'package:t_store/features/personalization/presentation/cubit/addresses_cubit.dart';
@@ -20,6 +22,9 @@ import 'package:t_store/features/personalization/presentation/cubit/addresses_st
 class MockGetProfileUsecase extends Mock implements GetProfileUsecase {}
 
 class MockUpdateProfileUsecase extends Mock implements UpdateProfileUsecase {}
+
+// تم إضافة الـ Mock ده 👇
+class MockUploadAvatarUsecase extends Mock implements UploadAvatarUsecase {}
 
 class MockGetAddressesUsecase extends Mock implements GetAddressesUsecase {}
 
@@ -108,14 +113,20 @@ void main() {
     late ProfileCubit profileCubit;
     late MockGetProfileUsecase mockGetProfileUsecase;
     late MockUpdateProfileUsecase mockUpdateProfileUsecase;
+    // تم إضافة تعريف المتغير ده 👇
+    late MockUploadAvatarUsecase mockUploadAvatarUsecase;
 
     setUp(() {
       mockGetProfileUsecase = MockGetProfileUsecase();
       mockUpdateProfileUsecase = MockUpdateProfileUsecase();
+      // تم إضافة الـ Setup ده 👇
+      mockUploadAvatarUsecase = MockUploadAvatarUsecase();
 
       profileCubit = ProfileCubit(
         getProfileUsecase: mockGetProfileUsecase,
         updateProfileUsecase: mockUpdateProfileUsecase,
+        // تم تمرير الـ Usecase هنا عشان الخطأ يختفي 👇
+        uploadAvatarUsecase: mockUploadAvatarUsecase,
       );
     });
 

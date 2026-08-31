@@ -11,6 +11,7 @@ class RoundedImage extends StatelessWidget {
     required this.roundedImageModel,
   });
   final RoundedImageModel roundedImageModel;
+
   @override
   Widget build(BuildContext context) {
     final dark = THelperFunctions.isDarkMode(context);
@@ -67,12 +68,24 @@ class RoundedImage extends StatelessWidget {
                   color: roundedImageModel.overlayColor,
                   fit: roundedImageModel.fit,
                 )
-              : Image(
-                  image: AssetImage(
-                    roundedImageModel.image,
-                  ),
+              : Image.asset(
+                  roundedImageModel.image,
                   color: roundedImageModel.overlayColor,
-                  fit: roundedImageModel.fit,
+                  fit: roundedImageModel.fit ?? BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    // دي بتطبع في الديباج كونسول لو فيه مشكلة في مسار الصورة عشان تعرفه فوراً
+                    debugPrint('❌ Failed to load asset image: ${roundedImageModel.image} | Error: $error');
+                    return Container(
+                      color: dark ? TColors.darkerGrey : TColors.light,
+                      child: Center(
+                        child: Icon(
+                          Icons.image_not_supported_rounded,
+                          color: dark ? Colors.white54 : Colors.black54,
+                          size: 35,
+                        ),
+                      ),
+                    );
+                  },
                 ),
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:t_store/core/common/view_models/brand_title_with_verification_view_model.dart';
 import 'package:t_store/core/common/view_models/circular_container_view_model.dart';
@@ -42,7 +43,12 @@ class _VerticalProductCardState extends State<VerticalProductCard> {
       image: widget.product.images.isNotEmpty ? widget.product.images.first : '',
       brandName: widget.product.brandName ?? 'Nexora',
     );
-    isInWishlist = WishlistCubit().isExist(currentItem);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isInWishlist = context.read<WishlistCubit>().isExist(currentItem);
   }
 
   @override
@@ -54,28 +60,26 @@ class _VerticalProductCardState extends State<VerticalProductCard> {
       image: widget.product.images.isNotEmpty ? widget.product.images.first : '',
       brandName: widget.product.brandName ?? 'Nexora',
     );
-    isInWishlist = WishlistCubit().isExist(currentItem);
+    isInWishlist = context.read<WishlistCubit>().isExist(currentItem);
   }
 
   @override
   Widget build(BuildContext context) {
     final dark = THelperFunctions.isDarkMode(context);
 
+    // التحقق هل الصورة من الإنترنت أو ملف محلي (Asset)
+    final String imagePath = widget.product.images.isNotEmpty ? widget.product.images.first : '';
+    final bool isNetwork = imagePath.startsWith('http');
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () async {
-         THelperFunctions.navigateToScreen(
+        THelperFunctions.navigateToScreen(
           context,
-          ProductDetailsView(
-            title: widget.product.name,
-            price: "\$${widget.product.price}",
-            imageUrl: widget.product.images.isNotEmpty ? widget.product.images.first : '',
-            description: widget.product.description ?? '',
-            brandName: widget.product.brandName ?? 'Nexora',
-          ),
+          ProductDetailsView(product: widget.product),
         );
         setState(() {
-          isInWishlist = WishlistCubit().isExist(currentItem);
+          isInWishlist = context.read<WishlistCubit>().isExist(currentItem);
         });
       },
       child: Container(
@@ -100,22 +104,16 @@ class _VerticalProductCardState extends State<VerticalProductCard> {
                   children: [
                     RoundedImage(
                       roundedImageModel: RoundedImageModel(
-                        isNetworkImage: true,
+                        isNetworkImage: isNetwork, // يتعرف تلقائياً 👈
                         backgroundColor: dark ? TColors.dark : TColors.light,
-                        image: widget.product.images.first,
+                        image: imagePath,
                         onTap: () async {
-                           THelperFunctions.navigateToScreen(
+                          THelperFunctions.navigateToScreen(
                             context,
-                            ProductDetailsView(
-                              title: widget.product.name,
-                              price: "\$${widget.product.price}",
-                              imageUrl: widget.product.images.isNotEmpty ? widget.product.images.first : '',
-                              description: widget.product.description ?? '',
-                              brandName: widget.product.brandName ?? 'Nexora',
-                            ),
+                            ProductDetailsView(product: widget.product),
                           );
                           setState(() {
-                            isInWishlist = WishlistCubit().isExist(currentItem);
+                            isInWishlist = context.read<WishlistCubit>().isExist(currentItem);
                           });
                         },
                         applyImageRadius: true,
@@ -130,13 +128,13 @@ class _VerticalProductCardState extends State<VerticalProductCard> {
                         Container(
                           decoration: BoxDecoration(
                             color: isInWishlist 
-                                ? Colors.red.withOpacity(0.15) 
+                                ? Colors.red.withValues(alpha: 0.15) 
                                 : (dark ? TColors.darkerGrey : TColors.white),
                             shape: BoxShape.circle,
                             boxShadow: isInWishlist 
                                 ? [
                                     BoxShadow(
-                                      color: Colors.red.withOpacity(0.4),
+                                      color: Colors.red.withValues(alpha: 0.4),
                                       blurRadius: 8,
                                       spreadRadius: 2,
                                     )
@@ -145,9 +143,9 @@ class _VerticalProductCardState extends State<VerticalProductCard> {
                           ),
                           child: IconButton(
                             onPressed: () {
-                              WishlistCubit().toggleWishlist(currentItem);
+                              context.read<WishlistCubit>().toggleWishlist(currentItem);
                               setState(() {
-                                isInWishlist = WishlistCubit().isExist(currentItem);
+                                isInWishlist = context.read<WishlistCubit>().isExist(currentItem);
                               });
                             },
                             icon: Icon(
@@ -207,4 +205,3 @@ class _VerticalProductCardState extends State<VerticalProductCard> {
     );
   }
 }
-

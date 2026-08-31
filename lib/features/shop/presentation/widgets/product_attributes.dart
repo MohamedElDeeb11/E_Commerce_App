@@ -41,7 +41,7 @@ class ProductAttributes extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: selected ? TColors.primary.withOpacity(0.1) : Colors.transparent,
+        color: selected ? TColors.primary.withValues(alpha: 0.1) : Colors.transparent,
         border: Border.all(color: selected ? TColors.primary : TColors.grey),
         borderRadius: BorderRadius.circular(8),
       ),

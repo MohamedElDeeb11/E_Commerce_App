@@ -7,7 +7,9 @@ class ProfileEntityTile extends StatelessWidget {
     super.key,
     required this.profileEntityTileModel,
   });
+  
   final ProfileEntityTileModel profileEntityTileModel;
+  
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -34,10 +36,12 @@ class ProfileEntityTile extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Icon(
-                profileEntityTileModel.trailing,
-                size: 18,
-              ),
+              child: profileEntityTileModel.trailing != null
+                  ? Icon(
+                      profileEntityTileModel.trailing,
+                      size: 18,
+                    )
+                  : const SizedBox(), 
             )
           ],
         ),

@@ -30,7 +30,7 @@ class WishlistCubit extends Cubit<WishlistState> {
   WishlistCubit._internal() : super(WishlistInitial());
 
   final List<WishlistItemModel> wishlistItems = [];
-
+// ignore_for_file: avoid_print
   bool isExist(WishlistItemModel item) {
     final exists = wishlistItems.any((element) => 
       element.title.trim().toLowerCase() == item.title.trim().toLowerCase()

@@ -60,7 +60,7 @@ class CartView extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: items.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, _) =>
                   const SizedBox(height: TSizes.spaceBtwItems),
               itemBuilder: (context, index) {
                 final item = items[index];
@@ -101,7 +101,7 @@ class CartView extends StatelessWidget {
                                 : Image.network(
                                     item.image,
                                     fit: BoxFit.contain,
-                                    errorBuilder: (_, __, ___) => Image.asset(
+                                    errorBuilder: (_, _, _) => Image.asset(
                                       'assets/images/products/product-shirt.png',
                                     ),
                                   ),
@@ -212,7 +212,7 @@ class CartView extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
+                  color: Colors.black.withValues(alpha: 0.08),
                   blurRadius: 10,
                   offset: const Offset(0, -5),
                 ),

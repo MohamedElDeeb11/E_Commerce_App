@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:t_store/core/utils/constants/colors.dart';
 import 'package:t_store/core/utils/helpers/helper_functions.dart';
+import 'package:t_store/features/shop/data/models/product_model.dart';
 import 'package:t_store/features/shop/presentation/views/product_details_view.dart';
 
 class HorizontalProductCard extends StatelessWidget {
@@ -29,14 +30,28 @@ class HorizontalProductCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
+        // بنعمل ProductModel مؤقت بالبيانات المتاحة عشان نبعته لصفحة التفاصيل 👈
+        final productModel = ProductModel(
+          id: 'horizontal_${title.hashCode}',
+          name: title,
+          description: description,
+          price: double.tryParse(price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0,
+          salePrice: double.tryParse(price.replaceAll(RegExp(r'[^0-9.]'), '')),
+          categoryId: 'general',
+          stock: 10,
+          images: [imageUrl],
+          thumbnail: imageUrl,
+          rating: 4.5,
+          reviewsCount: int.tryParse(reviewsCount) ?? 20,
+          isFeatured: true,
+          isActive: true,
+          categoryName: 'General',
+          brandName: 'Nexora',
+        );
+
         THelperFunctions.navigateToScreen(
           context,
-          ProductDetailsView(
-            title: title,
-            price: price,
-            imageUrl: imageUrl,
-            description: description, brandName: 'Nexora',
-          ),
+          ProductDetailsView(product: productModel),
         );
       },
       child: Container(
@@ -72,6 +87,7 @@ class HorizontalProductCard extends StatelessWidget {
                       fit: BoxFit.contain,
                       width: double.infinity,
                       height: 110,
+                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.shopping_bag, size: 50, color: TColors.primary),
                     ),
                   ),
                   
@@ -83,7 +99,7 @@ class HorizontalProductCard extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: TColors.warning.withOpacity(0.9),
+                          color: TColors.warning.withValues(alpha: 0.9),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -100,7 +116,7 @@ class HorizontalProductCard extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: dark ? TColors.dark.withOpacity(0.5) : TColors.white,
+                        color: dark ? TColors.dark.withValues(alpha: 0.5) : TColors.white,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.favorite_border, color: TColors.primary, size: 16),

@@ -19,22 +19,7 @@ class HomeHeaderSection extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // 1. زرار القائمة
-          Container(
-            decoration: BoxDecoration(
-              color: dark ? TColors.darkerGrey : TColors.light,
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              onPressed: () {},
-              icon: Icon(
-                Iconsax.menu,
-                color: dark ? TColors.white : TColors.dark,
-              ),
-            ),
-          ),
-
-          // 2. اللوجو واسم الماركة (Nexora)
+          // 1. اللوجو واسم الماركة (Nexora) بقي هو أول عنصر على الشمال
           Row(
             children: [
               const Icon(
@@ -54,7 +39,7 @@ class HomeHeaderSection extends StatelessWidget {
             ],
           ),
           
-          // 3. صورة البروفايل وحدها على اليمين
+          // 2. صورة البروفايل على اليمين
           Container(
             width: 42,
             height: 42,

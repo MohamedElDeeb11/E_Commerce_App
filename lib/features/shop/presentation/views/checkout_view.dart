@@ -104,7 +104,7 @@ class _CheckoutViewState extends State<CheckoutView> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: paymentMethods.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, _) =>
                   const SizedBox(height: TSizes.spaceBtwItems),
               itemBuilder: (context, index) {
                 final method = paymentMethods[index];
@@ -142,7 +142,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                               width: 36,
                               height: 24,
                               fit: BoxFit.contain,
-                              errorBuilder: (_, __, ___) =>
+                              errorBuilder: (_, _, _) =>
                                   const Icon(Icons.payment, size: 24),
                             ),
                             const SizedBox(width: 16),
@@ -183,7 +183,7 @@ class _CheckoutViewState extends State<CheckoutView> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),
@@ -219,7 +219,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                           'assets/icons/payment_methods/successful_payment_icon.png',
                           width: 90,
                           height: 90,
-                          errorBuilder: (_, __, ___) => const Icon(
+                          errorBuilder: (_, _, _) => const Icon(
                             Icons.check_circle,
                             color: Colors.redAccent,
                             size: 80,

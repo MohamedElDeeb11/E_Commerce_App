@@ -18,7 +18,11 @@ class HorizontalSmallListViewItem extends StatelessWidget {
     final dark = THelperFunctions.isDarkMode(context);
     return GestureDetector(
       onTap: () =>
-          THelperFunctions.navigateToScreen(context, const SubCategoryView()),
+          // تم تمرير عنوان العنصر هنا عشان يفتح شاشة الأقسام بالمنتجات الخاصة بيه 👈
+          THelperFunctions.navigateToScreen(
+            context, 
+            SubCategoryView(categoryTitle: item.title),
+          ),
       child: Padding(
         padding: const EdgeInsets.only(right: TSizes.defaultSpace),
         child: Column(

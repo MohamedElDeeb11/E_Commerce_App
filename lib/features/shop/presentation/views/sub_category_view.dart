@@ -1,83 +1,84 @@
 import 'package:flutter/material.dart';
-import 'package:t_store/core/common/view_models/app_bar_view_model.dart';
-import 'package:t_store/core/common/view_models/rounded_image_view_model.dart';
-import 'package:t_store/core/common/view_models/section_heading_view_model.dart';
-import 'package:t_store/core/common/widgets/app_bar.dart';
-import 'package:t_store/core/common/widgets/horizontal_product_card.dart';
-import 'package:t_store/core/common/widgets/rounded_image.dart';
-import 'package:t_store/core/common/widgets/section_heading.dart';
-import 'package:t_store/core/utils/constants/image_strings.dart';
-import 'package:t_store/core/utils/constants/sizes.dart';
+import 'package:t_store/features/shop/data/dummy_products.dart';
+import 'package:t_store/features/shop/data/models/product_model.dart';
 
 class SubCategoryView extends StatelessWidget {
-  const SubCategoryView({super.key});
+  final String categoryTitle; // اسم القسم اللي جاي من الرئيسية (مثلا Laptops أو Shirts)
+
+  const SubCategoryView({super.key, required this.categoryTitle});
 
   @override
   Widget build(BuildContext context) {
+    // بنفلتر المنتجات الوهمية بحيث تجيب المنتجات التابعة للقسم ده بس
+    final List<ProductModel> filteredProducts = DummyData.products
+        .where((product) => product.categoryName?.toLowerCase() == categoryTitle.toLowerCase())
+        .toList();
+
     return Scaffold(
-      appBar: CustomAppBar(
-        appBarModel: AppBarModel(
-          hasArrowBack: true,
-          title: const Text("Sports Shirts"),
-        ),
+      appBar: AppBar(
+        title: Text(categoryTitle),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(TSizes.defaultSpace),
-            child: Column(
-              children: [
-                // 1. البانر
-                RoundedImage(
-                  roundedImageModel: RoundedImageModel(
-                    image: TImages.promoBanner2,
-                    applyImageRadius: true,
-                    width: double.infinity,
-                  ),
+      body: filteredProducts.isEmpty
+          ? const Center(
+              child: Text('عذراً، لا توجد منتجات متاحة في هذا القسم حالياً'),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: GridView.builder(
+                itemCount: filteredProducts.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // عمودين جنب بعض
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: 0.75, // نسبة الطول للعرض عشان الكارت يطلع مظبوط
                 ),
-                const SizedBox(
-                  height: TSizes.spaceBtwSections,
-                ),
-
-                Column(
-                  children: [
-                    // 2. الهيدر
-                    SectionHeading(
-                      sectionHeadingModel: SectionHeadingModel(
-                        title: 'Sports Shirts',
-                        showActionButton: false, 
-                      ), title: 'Sports Shirts',
+                itemBuilder: (context, index) {
+                  final product = filteredProducts[index];
+                  return Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    const SizedBox(
-                      height: TSizes.spaceBtwItems,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // صورة المنتج (مؤقتاً بنعرض أيقونة أو صورة لو متوفرة)
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                            ),
+                            child: const Center(
+                              child: Icon(Icons.shopping_bag, size: 50, color: Colors.grey),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                product.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '\$${product.price}',
+                                style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-
-                    // 3. لستة المنتجات
-                    SizedBox(
-                      height: 160, 
-                      child: ListView.separated(
-                        itemCount: 5,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) => const HorizontalProductCard(
-                          title: 'Nike Sports Shirt',
-                          description: 'Nike',
-                          price: '\$25.0',
-                          oldPrice: '\$35.0',
-                          discount: '15%', imageUrl: '',
-                        ),
-                        separatorBuilder: (context, index) => const SizedBox(
-                          width: TSizes.spaceBtwItems,
-                        ),
-                      ),
-                    )
-                  ],
-                )
-              ],
+                  );
+                },
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

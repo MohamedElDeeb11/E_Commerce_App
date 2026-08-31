@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:t_store/core/common/view_models/rounded_image_view_model.dart';
 import 'package:t_store/core/common/view_models/section_heading_view_model.dart';
-import 'package:t_store/core/common/widgets/rounded_image.dart';
 import 'package:t_store/core/common/widgets/section_heading.dart';
-import 'package:t_store/core/utils/constants/image_strings.dart';
 import 'package:t_store/core/utils/constants/sizes.dart';
 import 'package:t_store/features/personalization/presentation/view_models/profile_entity_tile_model.dart';
-import 'package:t_store/features/personalization/presentation/views/profile_view.dart';
 import 'package:t_store/features/personalization/presentation/widgets/profile_entity_tile_list.dart';
 
 class ProfileInformationSection extends StatelessWidget {
@@ -20,26 +16,6 @@ class ProfileInformationSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(
-          width: double.infinity,
-          child: Column(
-            children: [
-              RoundedImage(
-                roundedImageModel: RoundedImageModel(
-                  image: TImages.user,
-                  width: 80,
-                  height: 80,
-                  onTap: () {},
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: const Text("Change Profile Picture"),
-              ),
-            ],
-          ),
-        ),
-        const SpaceBetweenSectionsWithDivider(),
         SectionHeading(
             sectionHeadingModel: SectionHeadingModel(
                 title: "Profile Information", showActionButton: false)),
