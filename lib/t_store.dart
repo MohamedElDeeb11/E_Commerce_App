@@ -19,6 +19,7 @@ import 'package:t_store/features/shop/presentation/cubit/categories_cubit.dart';
 import 'package:t_store/features/shop/presentation/cubit/products_cubit.dart';
 import 'package:t_store/features/wishlist/presentation/cubit/wishlist_cubit.dart';
 import 'package:t_store/core/utils/localizations/app_localizations.dart';
+import 'package:t_store/features/auth/presentation/views/splash/splash_view.dart';
 
 class TStore extends StatelessWidget {
   const TStore({super.key});
@@ -99,7 +100,7 @@ class TStore extends StatelessWidget {
                   );
                 },
 
-                home: const NavigationMenu(),
+                home: const SplashView(),
               );
             },
           );

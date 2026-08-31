@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:t_store/core/usecases/usecase.dart';
+import 'package:t_store/core/dependency_injection/service_locator.dart';
+import 'package:t_store/core/utils/local_preferences_helper.dart';
 import 'package:t_store/features/auth/domain/usecases/sign_in_usecase.dart';
 import 'package:t_store/features/auth/domain/usecases/sign_up_usecase.dart';
 import 'package:t_store/features/auth/domain/usecases/sign_out_usecase.dart';
@@ -58,7 +60,10 @@ class AuthCubit extends Cubit<AuthState> {
           emit(AuthError(error));
         }
       },
-      (user) => emit(AuthAuthenticated(user)),
+      (user) {
+        sl<LocalPreferencesHelper>().setAuthToken(user.id);
+        emit(AuthAuthenticated(user));
+      },
     );
   }
 
@@ -90,7 +95,10 @@ class AuthCubit extends Cubit<AuthState> {
 
     result.fold(
       (error) => emit(AuthError(error)),
-      (_) => emit(AuthUnauthenticated()),
+      (_) {
+        sl<LocalPreferencesHelper>().clearAuthToken();
+        emit(AuthUnauthenticated());
+      },
     );
   }
 

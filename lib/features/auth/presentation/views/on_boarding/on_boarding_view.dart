@@ -8,8 +8,9 @@ import 'package:t_store/core/utils/constants/text_strings.dart';
 import 'package:t_store/features/auth/presentation/view_models/on_boarding_model.dart';
 import 'package:t_store/features/auth/presentation/logic/on_boarding/on_boarding_cubit.dart';
 import 'package:t_store/features/auth/presentation/widgets/on_boarding_page.dart';
-// تم إضافة سطر الاستدعاء الخاص بشاشة تسجيل الدخول
-import 'package:t_store/features/auth/presentation/views/login/login_view.dart'; 
+import 'package:t_store/features/auth/presentation/views/login/login_view.dart';
+import 'package:t_store/core/dependency_injection/service_locator.dart';
+import 'package:t_store/core/utils/local_preferences_helper.dart'; 
 
 class OnBoardingView extends StatefulWidget {
   const OnBoardingView({super.key});
@@ -44,12 +45,14 @@ class _OnBoardingViewState extends State<OnBoardingView> {
         actions: [
           // زرار Skip على اليمين
           TextButton(
-            onPressed: () {
-              // تم التعديل: نقل مباشر لشاشة Login بدل التقليب لآخر صفحة
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginView()),
-              );
+            onPressed: () async {
+              await sl<LocalPreferencesHelper>().setHasSeenOnboarding(true);
+              if (context.mounted) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginView()),
+                );
+              }
             },
             child: const Text(
               'Skip',
@@ -148,13 +151,15 @@ class _OnBoardingViewState extends State<OnBoardingView> {
 
                 // زرار Next أو Get Started
                 TextButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (currentPage == 2) {
-                      // تم التعديل: نقل لشاشة تسجيل الدخول
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const LoginView()), 
-                      );
+                      await sl<LocalPreferencesHelper>().setHasSeenOnboarding(true);
+                      if (context.mounted) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const LoginView()), 
+                        );
+                      }
                     } else {
                       pageController.nextPage(
                         duration: const Duration(milliseconds: 300),

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:t_store/core/utils/constants/colors.dart';
+import 'package:t_store/core/dependency_injection/service_locator.dart';
+import 'package:t_store/core/utils/local_preferences_helper.dart';
 import 'package:t_store/features/auth/presentation/views/on_boarding/on_boarding_view.dart';
+import 'package:t_store/features/auth/presentation/views/login/login_view.dart';
+import 'package:t_store/core/common/widgets/navigation_menu.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -13,46 +17,45 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     super.initState();
-    _navigateToHome();
+    _navigateToNextScreen();
   }
 
-  // دالة عشان تستنى ثانيتين وبعدين تنقل لصفحة البداية
-  Future<void> _navigateToHome() async {
+  Future<void> _navigateToNextScreen() async {
     await Future.delayed(const Duration(seconds: 2), () {});
     if (mounted) {
+      final prefs = sl<LocalPreferencesHelper>();
+      final hasSeenOnboarding = prefs.hasSeenOnboarding;
+      final authToken = prefs.authToken;
+
+      Widget nextScreen;
+      if (!hasSeenOnboarding) {
+        nextScreen = const OnBoardingView();
+      } else if (authToken != null && authToken.isNotEmpty) {
+        nextScreen = const NavigationMenu();
+      } else {
+        nextScreen = const LoginView();
+      }
+
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const OnBoardingView()),
+        MaterialPageRoute(builder: (context) => nextScreen),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: TColors.light, // خلفية بيضاء صريحة
+      backgroundColor: isDark ? TColors.dark : TColors.light,
       body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // الأيقونة (مؤقتاً لحد ما تحط صورة اللوجو بتاعك)
-            const Icon(
-              Icons.all_inclusive_rounded, // أيقونة قريبة من شكل التداخل
-              color: TColors.primary, // أحمر نكسورا
-              size: 55,
-            ),
-            const SizedBox(width: 10),
-            // كلمة NEXORA
-            Text(
-              "NEXORA",
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                    fontWeight: FontWeight.w900, // خط عريض جداً
-                    color: TColors.primary, // أحمر
-                    letterSpacing: 2,
-                    fontSize: 40,
-                  ),
-            ),
-          ],
+        child: Image.asset(
+          isDark
+              ? 'assets/logos/t-store-splash-logo-white.png'
+              : 'assets/logos/t-store-splash-logo-black.png',
+          width: 180,
+          height: 180,
+          fit: BoxFit.contain,
         ),
       ),
     );
