@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:t_store/core/dependency_injection/service_locator.dart';
+import 'package:t_store/core/dependency_injection/get_it.dart.dart';
 import 'package:t_store/core/enums/status.dart';
 import 'package:t_store/features/auth/domain/usecases/register_usecase.dart';
 import 'package:t_store/features/auth/presentation/logic/register/register_state.dart';

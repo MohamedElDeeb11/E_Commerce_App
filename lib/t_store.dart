@@ -8,7 +8,7 @@ import 'package:t_store/core/cubits/navigation_menu_cubit/navigation_menu_cubit.
 import 'package:t_store/core/cubits/theme_cubit/theme_cubit.dart';
 import 'package:t_store/core/cubits/theme_cubit/theme_state.dart';
 import 'package:t_store/core/cubits/locale_cubit/locale_cubit.dart';
-import 'package:t_store/core/dependency_injection/service_locator.dart';
+import 'package:t_store/core/dependency_injection/get_it.dart.dart';
 import 'package:t_store/core/utils/theme/theme.dart';
 import 'package:t_store/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:t_store/features/auth/presentation/logic/on_boarding/on_boarding_cubit.dart';
@@ -48,7 +48,7 @@ class TStore extends StatelessWidget {
               return MaterialApp(
                 title: 'T Store',
                 debugShowCheckedModeBanner: false,
-                
+
                 // إعدادات اللغة الأساسية
                 locale: currentLocale,
                 supportedLocales: const [
@@ -61,7 +61,7 @@ class TStore extends StatelessWidget {
                   GlobalWidgetsLocalizations.delegate,
                   GlobalCupertinoLocalizations.delegate,
                 ],
-                
+
                 theme: TAppTheme.lightTheme.copyWith(
                   appBarTheme: TAppTheme.lightTheme.appBarTheme.copyWith(
                     systemOverlayStyle: const SystemUiOverlayStyle(
@@ -72,7 +72,7 @@ class TStore extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 darkTheme: TAppTheme.darkTheme.copyWith(
                   appBarTheme: TAppTheme.darkTheme.appBarTheme.copyWith(
                     systemOverlayStyle: const SystemUiOverlayStyle(
@@ -83,9 +83,9 @@ class TStore extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 themeMode: themeState.themeMode,
-                
+
                 builder: (context, child) {
                   final isDark = Theme.of(context).brightness == Brightness.dark;
                   return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -98,7 +98,7 @@ class TStore extends StatelessWidget {
                     child: child!,
                   );
                 },
-                
+
                 home: const NavigationMenu(),
               );
             },

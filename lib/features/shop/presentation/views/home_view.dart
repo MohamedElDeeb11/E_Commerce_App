@@ -7,7 +7,7 @@ import 'package:t_store/core/common/widgets/section_heading.dart';
 import 'package:t_store/features/shop/presentation/views/sub_category_view.dart';
 import 'package:t_store/features/shop/presentation/widgets/home_categories.dart';
 import 'package:t_store/features/personalization/presentation/cubit/profile_cubit.dart';
-import 'package:t_store/core/dependency_injection/service_locator.dart';
+import 'package:t_store/core/dependency_injection/get_it.dart.dart';
 import '../widgets/home_header_section.dart';
 import '../widgets/promo_banner_carousel_slider.dart';
 

@@ -1,7 +1,7 @@
 // get_cached_user_cubit.dart
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:t_store/core/dependency_injection/service_locator.dart';
+import 'package:t_store/core/dependency_injection/get_it.dart.dart';
 import 'package:t_store/core/enums/status.dart';
 import 'package:t_store/features/auth/domain/usecases/get_cached_user_usecase.dart';
 import 'package:t_store/features/auth/presentation/logic/get_cached_user/get_cached_user_state.dart';

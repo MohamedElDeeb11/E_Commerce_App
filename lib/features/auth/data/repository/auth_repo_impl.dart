@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:t_store/core/dependency_injection/service_locator.dart';
+import 'package:t_store/core/dependency_injection/get_it.dart.dart';
 import 'package:t_store/features/auth/data/data_sources/auth_local_data_source.dart';
 import 'package:t_store/features/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:t_store/features/auth/data/models/change_password_req_body.dart';

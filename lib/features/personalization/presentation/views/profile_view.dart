@@ -16,7 +16,7 @@ import 'package:t_store/features/personalization/presentation/cubit/profile_stat
 import 'package:t_store/features/personalization/presentation/view_models/profile_entity_tile_model.dart';
 import 'package:t_store/features/personalization/presentation/widgets/personal_information_section.dart';
 import 'package:t_store/features/personalization/presentation/widgets/profile_information_section.dart';
-import 'package:t_store/core/dependency_injection/service_locator.dart';
+import 'package:t_store/core/dependency_injection/get_it.dart.dart';
 import 'package:t_store/features/auth/presentation/views/login/login_view.dart';
 
 class ProfileView extends StatelessWidget {
@@ -41,7 +41,7 @@ class ProfileViewBody extends StatefulWidget {
 class _ProfileViewBodyState extends State<ProfileViewBody> {
   File? _selectedImage;
   String? _currentAvatarUrl;
-  bool _isLoading = false; 
+  bool _isLoading = false;
 
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -54,7 +54,7 @@ class _ProfileViewBodyState extends State<ProfileViewBody> {
       try {
         final userId = Supabase.instance.client.auth.currentUser!.id;
         final fileName = 'avatar_${userId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-        
+
         await Supabase.instance.client.storage
             .from('avatars')
             .upload(fileName, _selectedImage!, fileOptions: const FileOptions(upsert: true));
@@ -70,8 +70,8 @@ class _ProfileViewBodyState extends State<ProfileViewBody> {
           setState(() {
             _currentAvatarUrl = imageUrl;
           });
-          context.read<ProfileCubit>().getProfile(); 
-          
+          context.read<ProfileCubit>().getProfile();
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('تم تحديث الصورة بنجاح!'),
@@ -119,7 +119,7 @@ class _ProfileViewBodyState extends State<ProfileViewBody> {
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(dialogContext); 
+              Navigator.pop(dialogContext);
               final newName = nameController.text.trim();
               if (newName.isNotEmpty && newName != currentName) {
                 setState(() => _isLoading = true);
@@ -131,9 +131,9 @@ class _ProfileViewBodyState extends State<ProfileViewBody> {
                       .from('profiles')
                       .update({'full_name': newName})
                       .eq('id', userId);
-                  
+
                   if (mounted) {
-                    setState(() {}); 
+                    setState(() {});
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('تم تحديث الاسم بنجاح!'),
@@ -191,7 +191,7 @@ class _ProfileViewBodyState extends State<ProfileViewBody> {
                           const Icon(Icons.wifi_off, size: 50, color: Colors.grey),
                           const SizedBox(height: TSizes.spaceBtwItems),
                           Text(
-                            state.message, 
+                            state.message,
                             style: const TextStyle(color: TColors.error, fontSize: 16),
                             textAlign: TextAlign.center,
                           ),
@@ -216,7 +216,7 @@ class _ProfileViewBodyState extends State<ProfileViewBody> {
                 final String realEmail = user?.email ?? "Not available";
                 final String realId = user?.id ?? "No ID";
                 final String realPhone = user?.phone ?? "No Phone";
-                
+
                 final String userAvatar = user?.avatarUrl ?? '';
                 final String avatarUrl = _currentAvatarUrl ?? (userAvatar.isNotEmpty ? userAvatar : '');
 
@@ -229,7 +229,7 @@ class _ProfileViewBodyState extends State<ProfileViewBody> {
                   ProfileEntityTileModel(
                     title: "Username",
                     value: realEmail.split('@').first,
-                    trailing: null, 
+                    trailing: null,
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('لا يمكن تعديل اسم المستخدم')),
@@ -237,7 +237,7 @@ class _ProfileViewBodyState extends State<ProfileViewBody> {
                     },
                   ),
                 ];
-                
+
                 final List<ProfileEntityTileModel> personalInformation = [
                   ProfileEntityTileModel(
                     trailing: Iconsax.copy,

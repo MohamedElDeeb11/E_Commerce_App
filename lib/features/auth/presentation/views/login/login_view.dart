@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:t_store/core/utils/constants/colors.dart';
 import 'package:t_store/core/utils/constants/sizes.dart';
 import 'package:t_store/core/utils/constants/text_strings.dart';
-import 'package:t_store/core/dependency_injection/service_locator.dart';
+import 'package:t_store/core/dependency_injection/get_it.dart.dart';
 import 'package:t_store/core/utils/helpers/helper_functions.dart';
 import 'package:t_store/features/auth/presentation/cubit/auth_cubit.dart';
 
@@ -32,16 +32,16 @@ class LoginView extends StatelessWidget {
                 children: [
                   const LoginHeaderSection(),
                   LoginFormSection(),
-                  
+
                   const SizedBox(height: TSizes.spaceBtwSections),
-                  
+
                   const DividerWidget(
                     text: TTexts.orSignInWith,
                   ),
                   const SizedBox(
                     height: TSizes.spaceBtwSections,
                   ),
-                  
+
                   SignInMethodsSection(),
 
                   const SizedBox(height: TSizes.spaceBtwSections * 1.5),

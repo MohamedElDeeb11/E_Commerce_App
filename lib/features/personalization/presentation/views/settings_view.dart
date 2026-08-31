@@ -11,10 +11,10 @@ import 'package:t_store/features/personalization/presentation/views/profile_view
 import 'package:t_store/features/personalization/presentation/views/user_addresses_view.dart';
 import 'package:t_store/features/personalization/presentation/cubit/profile_cubit.dart';
 import 'package:t_store/features/personalization/presentation/cubit/profile_state.dart';
-import 'package:t_store/core/dependency_injection/service_locator.dart';
+import 'package:t_store/core/dependency_injection/get_it.dart.dart';
 
 // استدعاء كارت الضيف (تأكد إن المسار ده متطابق مع مكان الملف اللي عملناه)
-import 'package:t_store/features/personalization/presentation/widgets/guest_profile_card.dart'; 
+import 'package:t_store/features/personalization/presentation/widgets/guest_profile_card.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
@@ -69,7 +69,7 @@ class SettingsViewBody extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: TSizes.spaceBtwItems),
-              
+
               // التعديل تم هنا يا هندسة 👇
               BlocBuilder<ProfileCubit, ProfileState>(
                 builder: (context, state) {
