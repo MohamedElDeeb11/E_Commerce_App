@@ -8,6 +8,7 @@ import 'package:t_store/core/cubits/locale_cubit/locale_cubit.dart';
 import 'package:t_store/core/utils/localizations/app_localizations.dart';
 import 'package:t_store/core/utils/helpers/helper_functions.dart';
 import 'package:t_store/features/personalization/presentation/views/profile_view.dart';
+import 'package:t_store/features/personalization/presentation/views/static_info_view.dart';
 import 'package:t_store/features/personalization/presentation/views/user_addresses_view.dart';
 import 'package:t_store/features/personalization/presentation/cubit/profile_cubit.dart';
 import 'package:t_store/features/personalization/presentation/cubit/profile_state.dart';
@@ -179,9 +180,48 @@ class SettingsViewBody extends StatelessWidget {
                 dark: isDark,
                 onChanged: (value) => context.read<ThemeCubit>().toggleTheme(value),
               ),
-              _buildSettingTile(icon: Iconsax.security_card, title: 'privacy'.tr(context), dark: isDark, onTap: () {}),
-              _buildSettingTile(icon: Iconsax.headphone, title: 'help_center'.tr(context), dark: isDark, onTap: () {}),
-              _buildSettingTile(icon: Iconsax.info_circle, title: 'about_us'.tr(context), dark: isDark, onTap: () {}),
+              _buildSettingTile(
+                icon: Iconsax.security_card,
+                title: 'privacy'.tr(context),
+                dark: isDark,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const StaticInfoView(
+                      title: 'Privacy Policy',
+                      content: 'Welcome to T-Store. Your privacy is critically important to us. We collect and process your data securely in accordance with industry standards to deliver the best e-commerce experience.',
+                    ),
+                  ),
+                ),
+              ),
+              _buildSettingTile(
+                icon: Iconsax.headphone,
+                title: 'help_center'.tr(context),
+                dark: isDark,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const StaticInfoView(
+                      title: 'Help Center & Contact Us',
+                      content: 'Need assistance? Reach out to our 24/7 support team at support@t-store.com or call us at +1-800-TSTORE.',
+                    ),
+                  ),
+                ),
+              ),
+              _buildSettingTile(
+                icon: Iconsax.info_circle,
+                title: 'about_us'.tr(context),
+                dark: isDark,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const StaticInfoView(
+                      title: 'About Us',
+                      content: 'T-Store is your ultimate e-commerce destination for premium accessories and electronics. We strive to bring quality, affordability, and exceptional customer service right to your fingertips.',
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: TSizes.spaceBtwSections),
             ],
           ),

@@ -14,6 +14,7 @@ import 'package:t_store/core/utils/helpers/helper_functions.dart';
 import 'package:t_store/features/personalization/presentation/cubit/profile_cubit.dart';
 import 'package:t_store/features/personalization/presentation/cubit/profile_state.dart';
 import 'package:t_store/features/personalization/presentation/view_models/profile_entity_tile_model.dart';
+import 'package:t_store/core/utils/local_preferences_helper.dart';
 import 'package:t_store/features/personalization/presentation/widgets/personal_information_section.dart';
 import 'package:t_store/features/personalization/presentation/widgets/profile_information_section.dart';
 import 'package:t_store/core/dependency_injection/service_locator.dart';
@@ -326,7 +327,10 @@ class _ProfileViewBodyState extends State<ProfileViewBody> {
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TSizes.cardRadiusLg)),
                               ),
                               onPressed: () async {
-                                await Supabase.instance.client.auth.signOut();
+                                await sl<LocalPreferencesHelper>().clearAuthToken();
+                                try {
+                                  await Supabase.instance.client.auth.signOut();
+                                } catch (_) {}
                                 if (context.mounted) {
                                   THelperFunctions.navigateReplacementToScreen(context, const LoginView());
                                 }
