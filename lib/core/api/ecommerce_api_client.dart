@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
 class EcommerceApiClient {
-  final Dio dio;
+ late final Dio dio;
 
   EcommerceApiClient()
       : dio = Dio(

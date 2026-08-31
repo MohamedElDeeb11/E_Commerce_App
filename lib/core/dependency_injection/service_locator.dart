@@ -3,10 +3,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../api/ecommerce_api_client.dart';
 import '../utils/local_preferences_helper.dart';
 
-final getIt = GetIt.instance;
+final GetIt sl = GetIt.instance;
 
 Future<void> setupServiceLocator() async {
   final sharedPreferences = await SharedPreferences.getInstance();
-  getIt.registerSingleton<LocalPreferencesHelper>(LocalPreferencesHelper(sharedPreferences));
-  getIt.registerSingleton<EcommerceApiClient>(EcommerceApiClient());
+  sl.registerSingleton<LocalPreferencesHelper>(LocalPreferencesHelper(sharedPreferences));
+  sl.registerSingleton<EcommerceApiClient>(EcommerceApiClient());
 }

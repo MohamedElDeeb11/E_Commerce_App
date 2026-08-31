@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:t_store/core/dependency_injection/get_it.dart.dart';
+import 'package:t_store/core/dependency_injection/service_locator.dart';
 import 'package:t_store/core/enums/status.dart';
 import 'package:t_store/features/auth/data/models/send_otp_req_body.dart';
 import 'package:t_store/features/auth/domain/usecases/send_otp_usecase.dart';

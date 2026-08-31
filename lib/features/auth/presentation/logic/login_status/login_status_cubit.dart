@@ -1,6 +1,6 @@
 // login_status_cubit.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:t_store/core/dependency_injection/get_it.dart.dart';
+import 'package:t_store/core/dependency_injection/service_locator.dart';
 import 'package:t_store/features/auth/domain/usecases/is_logged_in_usecase.dart';
 import 'package:t_store/features/auth/presentation/logic/login_status/login_status_state.dart';
 

@@ -16,7 +16,7 @@ import 'package:t_store/features/personalization/presentation/cubit/profile_stat
 import 'package:t_store/features/personalization/presentation/view_models/profile_entity_tile_model.dart';
 import 'package:t_store/features/personalization/presentation/widgets/personal_information_section.dart';
 import 'package:t_store/features/personalization/presentation/widgets/profile_information_section.dart';
-import 'package:t_store/core/dependency_injection/get_it.dart.dart';
+import 'package:t_store/core/dependency_injection/service_locator.dart';
 import 'package:t_store/features/auth/presentation/views/login/login_view.dart';
 
 class ProfileView extends StatelessWidget {

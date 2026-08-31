@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:t_store/core/dependency_injection/get_it.dart.dart';
+import 'package:t_store/core/dependency_injection/service_locator.dart';
 import 'package:t_store/core/usecase/usecase.dart';
 import 'package:t_store/features/auth/data/models/send_otp_req_body.dart';
 import 'package:t_store/features/auth/data/models/send_otp_response.dart';

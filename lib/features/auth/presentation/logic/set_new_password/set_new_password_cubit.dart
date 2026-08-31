@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:t_store/core/dependency_injection/get_it.dart.dart';
+import 'package:t_store/core/dependency_injection/service_locator.dart';
 import 'package:t_store/core/enums/status.dart';
 import 'package:t_store/features/auth/data/models/change_password_req_body.dart';
 import 'package:t_store/features/auth/data/models/change_password_response.dart';

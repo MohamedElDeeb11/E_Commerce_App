@@ -11,7 +11,7 @@ import 'package:t_store/features/personalization/presentation/views/profile_view
 import 'package:t_store/features/personalization/presentation/views/user_addresses_view.dart';
 import 'package:t_store/features/personalization/presentation/cubit/profile_cubit.dart';
 import 'package:t_store/features/personalization/presentation/cubit/profile_state.dart';
-import 'package:t_store/core/dependency_injection/get_it.dart.dart';
+import 'package:t_store/core/dependency_injection/service_locator.dart';
 
 // استدعاء كارت الضيف (تأكد إن المسار ده متطابق مع مكان الملف اللي عملناه)
 import 'package:t_store/features/personalization/presentation/widgets/guest_profile_card.dart';

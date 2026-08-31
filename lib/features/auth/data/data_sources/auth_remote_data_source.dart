@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
-import 'package:t_store/core/dependency_injection/get_it.dart.dart';
+import 'package:t_store/core/dependency_injection/service_locator.dart';
 import 'package:t_store/core/network/dio_client.dart';
 import 'package:t_store/core/utils/constants/api_constants.dart';
 import 'package:t_store/core/utils/helpers/dio_exception_helper.dart';
