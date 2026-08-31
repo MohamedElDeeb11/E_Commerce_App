@@ -1,20 +1,27 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:t_store/core/utils/constants/api_constants.dart';
+import 'package:t_store/core/api/ecommerce_api_client.dart';
 import 'package:t_store/core/utils/exceptions/exceptions.dart';
+import 'package:t_store/features/shop/data/models/category_model.dart';
 import 'package:t_store/features/shop/data/models/product_model.dart';
+import 'package:t_store/features/shop/data/models/review_model.dart';
 
 abstract class ShopRemoteDataSource {
   Future<Either<TExceptions, List<ProductModel>>> getProductsList(
-      {int page = 0, int limit = 10});
+      {int page = 1, int limit = 10});
 
   Future<Either<TExceptions, ProductModel>> getProductById(
-      {required int productId});
+      {required dynamic productId});
 
   Future<Either<TExceptions, List<ProductModel>>> getProductsByCategory(
-      {required String categoryName});
+      {required String categoryId});
   Future<Either<TExceptions, List<ProductModel>>> getProductsBySearch(
-      {String? search = ""});
+      {String? search});
+
+  Future<Either<TExceptions, List<CategoryModel>>> getCategories();
+
+  Future<Either<TExceptions, List<ReviewModel>>> getProductReviews(
+      {required String productId});
 
   Future<Either<TExceptions, List<ProductModel>>> getSortedProducts({
     required String sortBy,
@@ -23,21 +30,23 @@ abstract class ShopRemoteDataSource {
 }
 
 class ShopRemoteDataSourceImpl implements ShopRemoteDataSource {
-  final Dio dio;
-  ShopRemoteDataSourceImpl({required this.dio});
+  final EcommerceApiClient apiClient;
+  ShopRemoteDataSourceImpl({required this.apiClient});
+
   @override
   Future<Either<TExceptions, ProductModel>> getProductById(
-      {required int productId}) async {
+      {required dynamic productId}) async {
     try {
-      var response = await dio.get(ApiConstants.getDummyProductById(productId));
+      var response = await apiClient.dio.get('api/products/$productId');
       if (response.statusCode == 200) {
-        var product = ProductModel.fromJson(response.data);
+        var data = response.data['data'] ?? response.data;
+        var product = ProductModel.fromJson(data);
         return Right(product);
       } else {
         return Left(TExceptions.fromCode(response.statusCode.toString()));
       }
     } on DioException catch (e) {
-      return Left(TExceptions.fromCode(e.response.toString()));
+      return Left(TExceptions(e.error?.toString() ?? e.message ?? 'Network error'));
     } catch (e) {
       return Left(TExceptions(e.toString()));
     }
@@ -45,20 +54,21 @@ class ShopRemoteDataSourceImpl implements ShopRemoteDataSource {
 
   @override
   Future<Either<TExceptions, List<ProductModel>>> getProductsList(
-      {int page = 0, int limit = 10}) async {
+      {int page = 1, int limit = 10}) async {
     try {
-      var response = await dio
-          .get(ApiConstants.getDummyProducts(page: page, limit: limit));
+      var response = await apiClient.dio
+          .get('api/products', queryParameters: {'page': page, 'limit': limit});
       if (response.statusCode == 200) {
-        var products = (response.data['products'] as List)
+        var data = response.data;
+        var list = (data is List ? data : data['data'] ?? data['products'] as List)
             .map((e) => ProductModel.fromJson(e))
             .toList();
-        return Right(products);
+        return Right(list);
       } else {
         return Left(TExceptions.fromCode(response.statusCode.toString()));
       }
     } on DioException catch (e) {
-      return Left(TExceptions.fromCode(e.response.toString()));
+      return Left(TExceptions(e.error?.toString() ?? e.message ?? 'Network error'));
     } catch (e) {
       return Left(TExceptions(e.toString()));
     }
@@ -66,20 +76,20 @@ class ShopRemoteDataSourceImpl implements ShopRemoteDataSource {
 
   @override
   Future<Either<TExceptions, List<ProductModel>>> getProductsByCategory(
-      {required String categoryName}) async {
+      {required String categoryId}) async {
     try {
-      var response = await dio.get(
-          ApiConstants.getDummyProductsByCategory(categoryName: categoryName));
+      var response = await apiClient.dio.get('api/categories/$categoryId/products');
       if (response.statusCode == 200) {
-        var products = (response.data['products'] as List)
+        var data = response.data;
+        var list = (data is List ? data : data['data'] ?? [])
             .map((e) => ProductModel.fromJson(e))
             .toList();
-        return Right(products);
+        return Right(list);
       } else {
         return Left(TExceptions.fromCode(response.statusCode.toString()));
       }
     } on DioException catch (e) {
-      return Left(TExceptions.fromCode(e.response.toString()));
+      return Left(TExceptions(e.error?.toString() ?? e.message ?? 'Network error'));
     } catch (e) {
       return Left(TExceptions(e.toString()));
     }
@@ -89,18 +99,60 @@ class ShopRemoteDataSourceImpl implements ShopRemoteDataSource {
   Future<Either<TExceptions, List<ProductModel>>> getProductsBySearch(
       {String? search}) async {
     try {
-      var response =
-          await dio.get(ApiConstants.getDummyProductsBySearch(search: search));
+      var response = await apiClient.dio
+          .get('api/products/search', queryParameters: {'q': search});
       if (response.statusCode == 200) {
-        var products = (response.data['products'] as List)
+        var data = response.data;
+        var list = (data is List ? data : data['data'] ?? [])
             .map((e) => ProductModel.fromJson(e))
             .toList();
-        return Right(products);
+        return Right(list);
       } else {
         return Left(TExceptions.fromCode(response.statusCode.toString()));
       }
     } on DioException catch (e) {
-      return Left(TExceptions.fromCode(e.response.toString()));
+      return Left(TExceptions(e.error?.toString() ?? e.message ?? 'Network error'));
+    } catch (e) {
+      return Left(TExceptions(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<TExceptions, List<CategoryModel>>> getCategories() async {
+    try {
+      var response = await apiClient.dio.get('api/categories');
+      if (response.statusCode == 200) {
+        var data = response.data;
+        var list = (data is List ? data : data['data'] ?? [])
+            .map((e) => CategoryModel.fromJson(e))
+            .toList();
+        return Right(list);
+      } else {
+        return Left(TExceptions.fromCode(response.statusCode.toString()));
+      }
+    } on DioException catch (e) {
+      return Left(TExceptions(e.error?.toString() ?? e.message ?? 'Network error'));
+    } catch (e) {
+      return Left(TExceptions(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<TExceptions, List<ReviewModel>>> getProductReviews(
+      {required String productId}) async {
+    try {
+      var response = await apiClient.dio.get('api/products/$productId/reviews');
+      if (response.statusCode == 200) {
+        var data = response.data;
+        var list = (data is List ? data : data['data'] ?? [])
+            .map((e) => ReviewModel.fromJson(e))
+            .toList();
+        return Right(list);
+      } else {
+        return Left(TExceptions.fromCode(response.statusCode.toString()));
+      }
+    } on DioException catch (e) {
+      return Left(TExceptions(e.error?.toString() ?? e.message ?? 'Network error'));
     } catch (e) {
       return Left(TExceptions(e.toString()));
     }
@@ -109,21 +161,6 @@ class ShopRemoteDataSourceImpl implements ShopRemoteDataSource {
   @override
   Future<Either<TExceptions, List<ProductModel>>> getSortedProducts(
       {required String sortBy, required String sortType}) async {
-    try {
-      var response = await dio.get(ApiConstants.getDummySortedProducts(
-          sortBy: sortBy, sortType: sortType));
-      if (response.statusCode == 200) {
-        var products = (response.data['products'] as List)
-            .map((e) => ProductModel.fromJson(e))
-            .toList();
-        return Right(products);
-      } else {
-        return Left(TExceptions.fromApi(response.data));
-      }
-    } on DioException catch (e) {
-      return Left(TExceptions.fromCode(e.response.toString()));
-    } catch (e) {
-      return Left(TExceptions(e.toString()));
-    }
+    return getProductsList();
   }
 }

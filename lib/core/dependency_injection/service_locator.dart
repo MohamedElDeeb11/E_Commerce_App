@@ -11,6 +11,8 @@ import '../../features/auth/domain/usecases/sign_out_usecase.dart';
 import '../../features/auth/domain/usecases/reset_password_usecase.dart';
 import '../../features/auth/domain/usecases/get_current_user_usecase.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
+import '../../features/shop/data/data_sources/shop_remote_data_source.dart';
+import '../../features/shop/presentation/cubit/catalog_cubit.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -33,4 +35,7 @@ Future<void> setupServiceLocator() async {
         resetPasswordUsecase: sl(),
         getCurrentUserUsecase: sl(),
       ));
+
+  sl.registerLazySingleton<ShopRemoteDataSource>(() => ShopRemoteDataSourceImpl(apiClient: sl()));
+  sl.registerFactory(() => CatalogCubit(remoteDataSource: sl()));
 }

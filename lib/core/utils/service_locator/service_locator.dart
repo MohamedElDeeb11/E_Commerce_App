@@ -1,5 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:t_store/core/api/ecommerce_api_client.dart';
 import 'package:t_store/core/cubits/navigation_menu_cubit/navigation_menu_cubit.dart';
 import 'package:t_store/features/shop/data/data_sources/shop_remote_data_source.dart';
 import 'package:t_store/features/shop/data/repository_impl/shop_repository_impl.dart';
@@ -11,12 +11,11 @@ import 'package:t_store/features/shop/domain/usecases/get_sorted_products_usecas
 final getIt = GetIt.instance;
 
 /// @deprecated Use setupServiceLocator from dependency_injection/service_locator.dart instead
-/// This service locator is for the old DummyJSON API and is kept for backwards compatibility
+/// This service locator is for the API and is kept for backwards compatibility
 void setupOldServiceLocator() {
-  getIt.registerSingleton<Dio>(Dio());
 // register data sources
   getIt.registerSingleton<ShopRemoteDataSourceImpl>(ShopRemoteDataSourceImpl(
-    dio: getIt.get<Dio>(),
+    apiClient: getIt.get<EcommerceApiClient>(),
   ));
 // register repositories
   getIt.registerSingleton<ShopRepositoryImpl>(ShopRepositoryImpl(
@@ -33,7 +32,6 @@ void setupOldServiceLocator() {
       GetProductsByCategoryUsecase(
           shopRepository: getIt.get<ShopRepositoryImpl>()));
 
-  // Note: GetProductByIdUsecase has been updated for Supabase and is registered in the new service_locator
   getIt.registerSingleton<GetSortedProductsUsecase>(GetSortedProductsUsecase(
       shopRepository: getIt.get<ShopRepositoryImpl>()));
 

@@ -12,20 +12,20 @@ class ShopRepositoryImpl implements ShopRepository {
   Future<Either<TExceptions, List<ProductEntity>>> getProductsByCategory(
       {required String categoryName}) async {
     return await remoteDataSource.getProductsByCategory(
-        categoryName: categoryName);
+        categoryId: categoryName);
   }
 
   @override
   Future<Either<TExceptions, List<ProductEntity>>> getProductsList({
-    int page = 0,
+    int page = 1,
     int limit = 10,
   }) async {
-    return await remoteDataSource.getProductsList();
+    return await remoteDataSource.getProductsList(page: page, limit: limit);
   }
 
   @override
   Future<Either<TExceptions, ProductEntity>> getProductById(
-      {required int productId}) async {
+      {required dynamic productId}) async {
     return await remoteDataSource.getProductById(productId: productId);
   }
 
@@ -36,7 +36,7 @@ class ShopRepositoryImpl implements ShopRepository {
   }
   
   @override
-  Future<Either<TExceptions, List<ProductEntity>>> getSortedProducts({required String sortBy, required String sortType}) async{
-  return await remoteDataSource.getSortedProducts(sortBy: sortBy, sortType: sortType);
+  Future<Either<TExceptions, List<ProductEntity>>> getSortedProducts({required String sortBy, required String sortType}) async {
+    return await remoteDataSource.getSortedProducts(sortBy: sortBy, sortType: sortType);
   }
 }
