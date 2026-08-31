@@ -1,9 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
-import 'package:t_store/core/dependency_injection/service_locator.dart';
-import 'package:t_store/core/network/dio_client.dart';
-import 'package:t_store/core/utils/constants/api_constants.dart';
+import 'package:t_store/core/api/ecommerce_api_client.dart';
 import 'package:t_store/core/utils/helpers/dio_exception_helper.dart';
 import 'package:t_store/core/utils/helpers/platform_exception_helper.dart';
 import 'package:t_store/features/auth/data/models/change_password_req_body.dart';
@@ -27,12 +25,16 @@ abstract class AuthRemoteDataSource {
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+  final EcommerceApiClient apiClient;
+
+  AuthRemoteDataSourceImpl({required this.apiClient});
+
   @override
   Future<Either<String, RegisterUserData>> register(
       {required RegisterReqBody registerReqBody}) async {
     try {
-      var response = await sl<DioClient>().post(
-        ApiConstants.registerUrl,
+      var response = await apiClient.dio.post(
+        'https://accessories-eshop.runasp.net/api/register',
         data: registerReqBody.toJson(),
       );
 
@@ -42,17 +44,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (registerResponseModel.status) {
         return Right(registerResponseModel.data!);
       } else {
-        return Left(registerResponseModel.errorMessage);
+        return Left(registerResponseModel.errorMessage.isNotEmpty
+            ? registerResponseModel.errorMessage
+            : registerResponseModel.errorMessageEn);
       }
     } on DioException catch (e) {
-      // Handle the DioException using DioExceptionHelper
-      return Left(DioExceptionHelper.handleDioError(e));
+      return Left(e.error?.toString() ?? DioExceptionHelper.handleDioError(e));
     } on PlatformException catch (e) {
-      // Handle the PlatformException using PlatformExceptionHelper
       return Left(PlatformExceptionHelper.handlePlatformError(e));
     } catch (e) {
-      return Left(
-          'حدث خطأ غير متوقع: $e'); // Arabic for "An unexpected error occurred"
+      return Left('حدث خطأ غير متوقع: $e');
     }
   }
 
@@ -60,8 +61,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<Either<String, LoginUserData>> login(
       {required LoginReqBody loginReqBody}) async {
     try {
-      var response = await sl<DioClient>().post(
-        ApiConstants.loginUrl,
+      var response = await apiClient.dio.post(
+        'https://accessories-eshop.runasp.net/api/login',
         data: loginReqBody.toJson(),
       );
 
@@ -73,14 +74,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         return Left(loginResponse.message);
       }
     } on DioException catch (e) {
-      // Handle the DioException using DioExceptionHelper
-      return Left(DioExceptionHelper.handleDioError(e));
+      return Left(e.error?.toString() ?? DioExceptionHelper.handleDioError(e));
     } on PlatformException catch (e) {
-      // Handle the PlatformException using PlatformExceptionHelper
       return Left(PlatformExceptionHelper.handlePlatformError(e));
     } catch (e) {
-      return Left(
-          'حدث خطأ غير متوقع: $e'); // Arabic for "An unexpected error occurred"
+      return Left('حدث خطأ غير متوقع: $e');
     }
   }
 
@@ -88,8 +86,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<Either<String, SendOtpResponseData>> sendOtp(
       {required SendOtpReqBody forgetPasswordReqBody}) async {
     try {
-      var response = await sl<DioClient>().post(ApiConstants.forgotPasswordUrl,
-          data: forgetPasswordReqBody.toJson());
+      var response = await apiClient.dio.post(
+        'https://accessories-eshop.runasp.net/api/forget_pass_user',
+        data: forgetPasswordReqBody.toJson(),
+      );
       SendOtpResponse forgetPassResponse =
           SendOtpResponse.fromJson(response.data);
       if (forgetPassResponse.status) {
@@ -98,14 +98,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         return Left(forgetPassResponse.message);
       }
     } on DioException catch (e) {
-      // Handle the DioException using DioExceptionHelper
-      return Left(DioExceptionHelper.handleDioError(e));
+      return Left(e.error?.toString() ?? DioExceptionHelper.handleDioError(e));
     } on PlatformException catch (e) {
-      // Handle the PlatformException using PlatformExceptionHelper
       return Left(PlatformExceptionHelper.handlePlatformError(e));
     } catch (e) {
-      return Left(
-          'حدث خطأ غير متوقع: $e'); // Arabic for "An unexpected error occurred"
+      return Left('حدث خطأ غير متوقع: $e');
     }
   }
 
@@ -114,14 +111,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       {required ChangePasswordReqBody changePasswordReqBody}) async {
     try {
       String token = changePasswordReqBody.token;
-      var response = await sl<DioClient>().post(
-        ApiConstants.resetPasswordUrl,
+      var response = await apiClient.dio.post(
+        'https://accessories-eshop.runasp.net/api/change_password',
         data: changePasswordReqBody.toJson(),
         options: Options(
           headers: {
-            'Authorization': 'Bearer $token', // Add the token here
-            'Content-Type':
-                'application/json', // Optionally set the content type
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
           },
         ),
       );
@@ -133,14 +129,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         return Left(changePasswordResponse.message);
       }
     } on DioException catch (e) {
-      // Handle the DioException using DioExceptionHelper
-      return Left(DioExceptionHelper.handleDioError(e));
+      return Left(e.error?.toString() ?? DioExceptionHelper.handleDioError(e));
     } on PlatformException catch (e) {
-      // Handle the PlatformException using PlatformExceptionHelper
       return Left(PlatformExceptionHelper.handlePlatformError(e));
     } catch (e) {
-      return Left(
-          'حدث خطأ غير متوقع: $e'); // Arabic for "An unexpected error occurred"
+      return Left('حدث خطأ غير متوقع: $e');
     }
   }
 }

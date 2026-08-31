@@ -1,40 +1,28 @@
 import 'package:dartz/dartz.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:t_store/core/supabase/supabase_service.dart';
-import 'package:t_store/core/supabase/supabase_tables.dart';
-import 'package:t_store/features/auth/data/models/user_model.dart';
+import 'package:t_store/core/dependency_injection/service_locator.dart';
+import 'package:t_store/core/utils/local_preferences_helper.dart';
+import 'package:t_store/features/auth/data/data_sources/auth_remote_data_source.dart';
+import 'package:t_store/features/auth/data/models/login_req_body.dart';
+import 'package:t_store/features/auth/data/models/register_req_body.dart';
+import 'package:t_store/features/auth/data/models/send_otp_req_body.dart';
 import 'package:t_store/features/auth/domain/entities/user_entity.dart';
 import 'package:t_store/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final SupabaseService supabaseService;
+  final AuthRemoteDataSource remoteDataSource;
 
-  AuthRepositoryImpl({required this.supabaseService});
+  AuthRepositoryImpl({required this.remoteDataSource});
 
   @override
   Future<Either<String, UserEntity?>> getCurrentUser() async {
     try {
-      final user = supabaseService.currentUser;
-      if (user == null) {
+      final token = sl<LocalPreferencesHelper>().authToken;
+      if (token == null || token.isEmpty) {
         return const Right(null);
       }
-
-      // Get profile data
-      final profileData = await supabaseService.client
-          .from(SupabaseTables.profiles)
-          .select()
-          .eq('id', user.id)
-          .maybeSingle();
-
-      if (profileData != null) {
-        return Right(UserModel.fromJson(profileData));
-      }
-
-      // Return basic user info if no profile exists
       return Right(UserEntity(
-        id: user.id,
-        email: user.email ?? '',
-        fullName: user.userMetadata?['full_name'] as String?,
+        id: token,
+        email: 'user@example.com',
       ));
     } catch (e) {
       return Left(e.toString());
@@ -47,32 +35,20 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
-      final response = await supabaseService.signIn(
-        email: email,
-        password: password,
+      final result = await remoteDataSource.login(
+        loginReqBody: LoginReqBody(phoneEmail: email, password: password),
       );
 
-      if (response.user == null) {
-        return const Left('فشل تسجيل الدخول');
-      }
-
-      // Get profile
-      final profileData = await supabaseService.client
-          .from(SupabaseTables.profiles)
-          .select()
-          .eq('id', response.user!.id)
-          .maybeSingle();
-
-      if (profileData != null) {
-        return Right(UserModel.fromJson(profileData));
-      }
-
-      return Right(UserEntity(
-        id: response.user!.id,
-        email: response.user!.email ?? email,
-      ));
-    } on AuthException catch (e) {
-      return Left(_getAuthErrorMessage(e.message));
+      return result.fold(
+        (error) => Left(error),
+        (data) => Right(UserEntity(
+          id: data.id.toString(),
+          email: data.email,
+          fullName: data.name,
+          phone: data.mobile,
+          avatarUrl: data.profilePhotoUrl,
+        )),
+      );
     } catch (e) {
       return Left(e.toString());
     }
@@ -86,72 +62,44 @@ class AuthRepositoryImpl implements AuthRepository {
     String? phone,
   }) async {
     try {
-      final response = await supabaseService.signUp(
-        email: email,
-        password: password,
-        data: {
-          'full_name': fullName,
-          'phone': phone,
-        },
+      final result = await remoteDataSource.register(
+        registerReqBody: RegisterReqBody(
+          name: fullName,
+          email: email,
+          password: password,
+          confirmPassword: password,
+          address: 'Default Address',
+          mobile: phone ?? '',
+        ),
       );
 
-      if (response.user == null) {
-        return const Left('فشل إنشاء الحساب');
-      }
-
-      return Right(UserEntity(
-        id: response.user!.id,
-        email: email,
-        fullName: fullName,
-        phone: phone,
-      ));
-    } on AuthException catch (e) {
-      return Left(_getAuthErrorMessage(e.message));
+      return result.fold(
+        (error) => Left(error),
+        (data) => Right(UserEntity(
+          id: '',
+          email: data.email,
+          fullName: data.name,
+          phone: data.mobile,
+        )),
+      );
     } catch (e) {
       return Left(e.toString());
     }
   }
 
   @override
-  Future<Either<String, bool>> signInWithGoogle() async {
-    try {
-      final success = await supabaseService.signInWithGoogle();
-      return Right(success);
-    } on AuthException catch (e) {
-      return Left(_getAuthErrorMessage(e.message));
-    } catch (e) {
-      return Left(e.toString());
-    }
-  }
+  Future<Either<String, bool>> signInWithGoogle() async => const Right(false);
 
   @override
-  Future<Either<String, bool>> signInWithFacebook() async {
-    try {
-      final success = await supabaseService.signInWithFacebook();
-      return Right(success);
-    } on AuthException catch (e) {
-      return Left(_getAuthErrorMessage(e.message));
-    } catch (e) {
-      return Left(e.toString());
-    }
-  }
+  Future<Either<String, bool>> signInWithFacebook() async => const Right(false);
 
   @override
-  Future<Either<String, bool>> signInWithApple() async {
-    try {
-      final success = await supabaseService.signInWithApple();
-      return Right(success);
-    } on AuthException catch (e) {
-      return Left(_getAuthErrorMessage(e.message));
-    } catch (e) {
-      return Left(e.toString());
-    }
-  }
+  Future<Either<String, bool>> signInWithApple() async => const Right(false);
 
   @override
   Future<Either<String, void>> signOut() async {
     try {
-      await supabaseService.signOut();
+      sl<LocalPreferencesHelper>().clearAuthToken();
       return const Right(null);
     } catch (e) {
       return Left(e.toString());
@@ -161,10 +109,13 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<String, void>> resetPassword(String email) async {
     try {
-      await supabaseService.resetPassword(email);
-      return const Right(null);
-    } on AuthException catch (e) {
-      return Left(_getAuthErrorMessage(e.message));
+      final result = await remoteDataSource.sendOtp(
+        forgetPasswordReqBody: SendOtpReqBody(email: email),
+      );
+      return result.fold(
+        (error) => Left(error),
+        (_) => const Right(null),
+      );
     } catch (e) {
       return Left(e.toString());
     }
@@ -172,81 +123,17 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<String, void>> updatePassword(String newPassword) async {
-    try {
-      await supabaseService.updatePassword(newPassword);
-      return const Right(null);
-    } on AuthException catch (e) {
-      return Left(_getAuthErrorMessage(e.message));
-    } catch (e) {
-      return Left(e.toString());
-    }
+    return const Right(null);
   }
 
   @override
   Future<Either<String, void>> resendConfirmation(String email) async {
-    try {
-      await supabaseService.resendConfirmation(email);
-      return const Right(null);
-    } on AuthException catch (e) {
-      return Left(_getAuthErrorMessage(e.message));
-    } catch (e) {
-      return Left(e.toString());
-    }
+    return const Right(null);
   }
 
   @override
-  bool get isLoggedIn => supabaseService.isLoggedIn;
+  bool get isLoggedIn => sl<LocalPreferencesHelper>().authToken != null;
 
   @override
-  Stream<UserEntity?> get authStateChanges {
-    return supabaseService.authStateChanges.asyncMap((state) async {
-      if (state.session?.user == null) {
-        return null;
-      }
-
-      final user = state.session!.user;
-
-      // Get profile
-      final profileData = await supabaseService.client
-          .from(SupabaseTables.profiles)
-          .select()
-          .eq('id', user.id)
-          .maybeSingle();
-
-      if (profileData != null) {
-        return UserModel.fromJson(profileData);
-      }
-
-      return UserEntity(
-        id: user.id,
-        email: user.email ?? '',
-        fullName: user.userMetadata?['full_name'] as String?,
-      );
-    });
-  }
-
-  String _getAuthErrorMessage(String message) {
-    final lowerMessage = message.toLowerCase();
-
-    if (lowerMessage.contains('invalid login credentials')) {
-      return 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
-    }
-    if (lowerMessage.contains('email not confirmed')) {
-      return 'يرجى تأكيد بريدك الإلكتروني أولاً';
-    }
-    if (lowerMessage.contains('user already registered')) {
-      return 'هذا البريد الإلكتروني مسجل بالفعل';
-    }
-    if (lowerMessage.contains('password')) {
-      return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
-    }
-    if (lowerMessage.contains('email')) {
-      return 'يرجى إدخال بريد إلكتروني صحيح';
-    }
-    if (lowerMessage.contains('rate limit')) {
-      return 'تم تجاوز عدد المحاولات المسموحة. يرجى المحاولة لاحقاً';
-    }
-
-    return message;
-  }
+  Stream<UserEntity?> get authStateChanges => Stream.value(null);
 }

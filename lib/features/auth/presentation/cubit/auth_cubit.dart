@@ -25,7 +25,7 @@ class AuthCubit extends Cubit<AuthState> {
   }) : super(AuthInitial());
 
   Future<void> checkAuthStatus() async {
-    emit(AuthLoading());
+    emit(AuthSubmitLoading());
 
     final result = await getCurrentUserUsecase(const NoParams());
 
@@ -33,7 +33,7 @@ class AuthCubit extends Cubit<AuthState> {
       (error) => emit(AuthUnauthenticated()),
       (user) {
         if (user != null) {
-          emit(AuthAuthenticated(user));
+          emit(AuthSessionEstablished(user));
         } else {
           emit(AuthUnauthenticated());
         }
@@ -45,7 +45,7 @@ class AuthCubit extends Cubit<AuthState> {
     required String email,
     required String password,
   }) async {
-    emit(AuthLoading());
+    emit(AuthSubmitLoading());
 
     final result = await signInUsecase(SignInParams(
       email: email,
@@ -57,12 +57,12 @@ class AuthCubit extends Cubit<AuthState> {
         if (error.contains('تأكيد بريدك')) {
           emit(AuthEmailConfirmationRequired(email));
         } else {
-          emit(AuthError(error));
+          emit(AuthFailure(error));
         }
       },
       (user) {
         sl<LocalPreferencesHelper>().setAuthToken(user.id);
-        emit(AuthAuthenticated(user));
+        emit(AuthSessionEstablished(user));
       },
     );
   }
@@ -73,7 +73,7 @@ class AuthCubit extends Cubit<AuthState> {
     required String fullName,
     String? phone,
   }) async {
-    emit(AuthLoading());
+    emit(AuthSubmitLoading());
 
     final result = await signUpUsecase(SignUpParams(
       email: email,
@@ -83,18 +83,21 @@ class AuthCubit extends Cubit<AuthState> {
     ));
 
     result.fold(
-      (error) => emit(AuthError(error)),
-      (user) => emit(AuthEmailConfirmationRequired(email)),
+      (error) => emit(AuthFailure(error)),
+      (user) {
+        sl<LocalPreferencesHelper>().setAuthToken(user.id);
+        emit(AuthSessionEstablished(user));
+      },
     );
   }
 
   Future<void> signOut() async {
-    emit(AuthLoading());
+    emit(AuthSubmitLoading());
 
     final result = await signOutUsecase(const NoParams());
 
     result.fold(
-      (error) => emit(AuthError(error)),
+      (error) => emit(AuthFailure(error)),
       (_) {
         sl<LocalPreferencesHelper>().clearAuthToken();
         emit(AuthUnauthenticated());
