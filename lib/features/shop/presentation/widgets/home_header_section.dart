@@ -9,8 +9,6 @@ class HomeHeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dark = THelperFunctions.isDarkMode(context);
-
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: TSizes.defaultSpace,

@@ -27,7 +27,7 @@ Future<void> main() async {
   // أو غيرها هنا لو انت مسميها حاجة تانية)
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL'] ?? '', 
-    anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
+    publishableKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
   );
 
   // 5. إزالة الاسبلاش سكرين
