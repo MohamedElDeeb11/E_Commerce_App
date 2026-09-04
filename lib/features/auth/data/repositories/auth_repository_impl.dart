@@ -36,17 +36,15 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     try {
       final result = await remoteDataSource.login(
-        loginReqBody: LoginReqBody(phoneEmail: email, password: password),
+        loginReqBody: LoginReqBody(email: email, password: password),
       );
 
       return result.fold(
         (error) => Left(error),
         (data) => Right(UserEntity(
-          id: data.id.toString(),
-          email: data.email,
-          fullName: data.name,
-          phone: data.mobile,
-          avatarUrl: data.profilePhotoUrl,
+          id: data.accessToken,
+          email: email,
+          fullName: 'User',
         )),
       );
     } catch (e) {
@@ -62,26 +60,46 @@ class AuthRepositoryImpl implements AuthRepository {
     String? phone,
   }) async {
     try {
+      final nameParts = fullName.trim().split(' ');
+      final firstName = nameParts.isNotEmpty ? nameParts.first : fullName;
+      final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+
       final result = await remoteDataSource.register(
         registerReqBody: RegisterReqBody(
-          name: fullName,
           email: email,
           password: password,
-          confirmPassword: password,
-          address: 'Default Address',
-          mobile: phone ?? '',
+          firstName: firstName,
+          lastName: lastName,
         ),
       );
 
       return result.fold(
         (error) => Left(error),
-        (data) => Right(UserEntity(
+        (_) => Right(UserEntity(
           id: '',
-          email: data.email,
-          fullName: data.name,
-          phone: data.mobile,
+          email: email,
+          fullName: fullName,
+          phone: phone,
         )),
       );
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<String, void>> verifyEmail({required String email, required String otp}) async {
+    try {
+      return await remoteDataSource.verifyEmail(email: email, otp: otp);
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<String, void>> resendOtp(String email) async {
+    try {
+      return await remoteDataSource.resendOtp(email: email);
     } catch (e) {
       return Left(e.toString());
     }

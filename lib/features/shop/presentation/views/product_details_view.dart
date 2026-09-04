@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:t_store/core/utils/constants/colors.dart';
 import 'package:t_store/core/utils/constants/sizes.dart';
 import 'package:t_store/core/utils/helpers/helper_functions.dart';
+import 'package:t_store/core/dependency_injection/service_locator.dart';
 import 'package:t_store/features/shop/domain/entities/product_entity.dart';
 import 'package:t_store/features/shop/presentation/cubit/cart_cubit.dart';
 import 'package:t_store/features/shop/presentation/cubit/wishlist_cubit.dart';

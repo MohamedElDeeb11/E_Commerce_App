@@ -1,0 +1,21 @@
+{
+  "settings": "Settings",
+  "account": "Account",
+  "settingSection": "Setting",
+  "notification": "Notification",
+  "language": "Language",
+  "darkMode": "Dark Mode",
+  "privacy": "Privacy",
+  "helpCenter": "Help Center",
+  "aboutUs": "About us",
+  "home": "Home",
+  "wishlist": "Wishlist",
+  "search": "Search",
+  "profile": "Profile",
+  "name": "Name",
+  "deleteAccount": "Delete Account",
+  "cart": "Shopping Cart",
+  "checkout": "Checkout",
+  "placeOrder": "Place Order",
+  "addToCart": "Add to Cart"
+}

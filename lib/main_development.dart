@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:t_store/core/supabase/supabase_service.dart';
 import 'package:t_store/core/dependency_injection/service_locator.dart';
-import 'package:t_store/core/utils/service_locator/service_locator.dart'
-    as old_locator;
 import 'package:t_store/t_store.dart';
 
 void main() async {
@@ -14,8 +12,6 @@ void main() async {
   await SupabaseService.initialize();
 
   await setupServiceLocator();
-
-  old_locator.setupOldServiceLocator();
 
   runApp(const TStore());
 }

@@ -1,0 +1,21 @@
+{
+  "settings": "الإعدادات",
+  "account": "الحساب",
+  "settingSection": "الإعدادات العامة",
+  "notification": "الإشعارات",
+  "language": "اللغة",
+  "darkMode": "الوضع الداكن",
+  "privacy": "الخصوصية",
+  "helpCenter": "مركز المساعدة",
+  "aboutUs": "من نحن",
+  "home": "الرئيسية",
+  "wishlist": "المفضلة",
+  "search": "بحث",
+  "profile": "الملف الشخصي",
+  "name": "الاسم",
+  "deleteAccount": "حذف الحساب",
+  "cart": "سلة التسوق",
+  "checkout": "إتمام الشراء",
+  "placeOrder": "تأكيد الطلب",
+  "addToCart": "أضف إلى السلة"
+}

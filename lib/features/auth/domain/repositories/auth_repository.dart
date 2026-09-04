@@ -40,6 +40,12 @@ abstract class AuthRepository {
   /// Resend confirmation email
   Future<Either<String, void>> resendConfirmation(String email);
 
+  /// Verify email with OTP
+  Future<Either<String, void>> verifyEmail({required String email, required String otp});
+
+  /// Resend OTP
+  Future<Either<String, void>> resendOtp(String email);
+
   /// Check if user is logged in
   bool get isLoggedIn;
 

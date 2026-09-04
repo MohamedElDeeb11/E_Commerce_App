@@ -1,3 +1,4 @@
+import 'package:t_store/features/auth/presentation/views/signup/verify_email_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
@@ -117,7 +118,7 @@ class _LoginFormSectionState extends State<LoginFormSection> {
   Widget build(BuildContext context) {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
-        if (state is AuthAuthenticated) {
+        if (state is AuthSessionEstablished || state is AuthAuthenticated) {
           THelperFunctions.showSnackBar(
             context: context,
             message: 'تم تسجيل الدخول بنجاح',
@@ -129,9 +130,14 @@ class _LoginFormSectionState extends State<LoginFormSection> {
             const NavigationMenu(),
           );
         } else if (state is AuthEmailConfirmationRequired) {
+          THelperFunctions.navigateToScreen(
+            context,
+            VerifyEmailView(email: state.email),
+          );
+        } else if (state is AuthFailure) {
           THelperFunctions.showSnackBar(
             context: context,
-            message: 'من فضلك قم بتأكيد البريد الإلكتروني أولاً',
+            message: state.message,
             type: SnackBarType.error,
           );
         } else if (state is AuthError) {
@@ -266,7 +272,7 @@ class _LoginFormSectionState extends State<LoginFormSection> {
               height: 55,
               child: BlocBuilder<AuthCubit, AuthState>(
                 builder: (context, state) {
-                  final isLoading = state is AuthLoading;
+                  final isLoading = state is AuthSubmitLoading || state is AuthLoading;
 
                   return ElevatedButton(
                     style: ElevatedButton.styleFrom(

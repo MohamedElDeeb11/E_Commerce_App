@@ -46,12 +46,12 @@ class RegisterUserData extends Equatable {
   final String token;
 
   const RegisterUserData({
-    required this.mobile,
-    required this.name,
-    required this.email,
-    required this.address,
+    this.mobile = '',
+    this.name = '',
+    this.email = '',
+    this.address = '',
     this.profilePhotoPath,
-    required this.token,
+    this.token = '',
   });
 
   factory RegisterUserData.fromJson(Map<String, dynamic> json) {

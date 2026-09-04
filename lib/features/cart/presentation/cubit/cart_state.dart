@@ -19,8 +19,13 @@ class CartLoaded extends CartState {
 
   int get itemCount => items.fold(0, (sum, item) => sum + item.quantity);
 
-  double get totalPrice =>
-      items.fold(0.0, (sum, item) => sum + item.totalPrice);
+  double get subtotal => items.fold(0.0, (sum, item) => sum + item.totalPrice);
+
+  double get shippingFee => items.isEmpty ? 0.0 : (subtotal > 50.0 ? 0.0 : 5.0);
+
+  double get taxFee => 0.0;
+
+  double get totalPrice => subtotal + shippingFee + taxFee;
 
   bool get isEmpty => items.isEmpty;
 
@@ -65,3 +70,4 @@ class CartItemRemoved extends CartState {
 }
 
 class CartCleared extends CartState {}
+

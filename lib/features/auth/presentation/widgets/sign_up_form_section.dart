@@ -14,6 +14,7 @@ import 'package:t_store/features/auth/presentation/cubit/auth_state.dart';
 import 'package:t_store/features/auth/presentation/views/login/login_view.dart';
 
 import 'terms_and_privacy_agreement.dart';
+import 'package:t_store/features/auth/presentation/views/signup/verify_email_view.dart';
 
 class SignUpFormSection extends StatefulWidget {
   const SignUpFormSection({super.key});
@@ -48,7 +49,11 @@ class _SignUpFormSectionState extends State<SignUpFormSection> {
   }
 
   void _handleRegistration() {
-    if (_formKey.currentState!.validate()) {
+    debugPrint('SignUp: _handleRegistration called');
+    final isValid = _formKey.currentState?.validate() ?? false;
+    debugPrint('SignUp: Form validation result: $isValid');
+    if (isValid) {
+      debugPrint('SignUp: Triggering AuthCubit.signUp with email: ${_emailController.text}');
       context.read<AuthCubit>().signUp(
             email: _emailController.text.trim().toLowerCase(),
             password: _passwordController.text.trim(),
@@ -56,6 +61,13 @@ class _SignUpFormSectionState extends State<SignUpFormSection> {
                 '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}',
             phone: _phoneController.text.trim(),
           );
+    } else {
+      debugPrint('SignUp: Form validation failed!');
+      THelperFunctions.showSnackBar(
+        context: context,
+        message: 'Please fill in all required fields correctly',
+        type: SnackBarType.error,
+      );
     }
   }
 
@@ -214,9 +226,23 @@ class _SignUpFormSectionState extends State<SignUpFormSection> {
             SizedBox(
               width: double.infinity,
               height: 55, // نفس ارتفاع زرار الدخول
-              child: BlocBuilder<AuthCubit, AuthState>(
+              child: BlocConsumer<AuthCubit, AuthState>(
+                listener: (context, state) {
+                  if (state is AuthFailure) {
+                    THelperFunctions.showSnackBar(
+                      context: context,
+                      message: state.message,
+                      type: SnackBarType.error,
+                    );
+                  } else if (state is AuthEmailConfirmationRequired) {
+                    THelperFunctions.navigateToScreen(
+                      context,
+                      VerifyEmailView(email: state.email),
+                    );
+                  }
+                },
                 builder: (context, state) {
-                  final isLoading = state is AuthLoading;
+                  final isLoading = state is AuthSubmitLoading || state is AuthLoading;
                   return ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: TColors.primary,

@@ -1,12 +1,14 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'token_refresh_interceptor.dart';
 
 class EcommerceApiClient {
- late final Dio dio;
+  late final Dio dio;
 
   EcommerceApiClient()
       : dio = Dio(
           BaseOptions(
-            baseUrl: 'https://accessories-eshop.runasp.net/scalar/',
+            baseUrl: dotenv.env['API_BASE_URL'] ?? 'https://accessories-eshop.runasp.net/',
             connectTimeout: const Duration(seconds: 15),
             receiveTimeout: const Duration(seconds: 15),
             headers: {
@@ -15,6 +17,7 @@ class EcommerceApiClient {
             },
           ),
         ) {
+    dio.interceptors.add(TokenRefreshInterceptor(dio));
     dio.interceptors.add(
       InterceptorsWrapper(
         onError: (DioException error, handler) {

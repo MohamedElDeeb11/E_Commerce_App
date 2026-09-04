@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
@@ -9,6 +8,18 @@ import 'package:t_store/features/shop/presentation/cubit/wishlist_cubit.dart';
 
 class WishlistView extends StatelessWidget {
   const WishlistView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => WishlistCubit(),
+      child: const WishlistViewBody(),
+    );
+  }
+}
+
+class WishlistViewBody extends StatelessWidget {
+  const WishlistViewBody({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +40,8 @@ class WishlistView extends StatelessWidget {
         elevation: 0,
       ),
       body: BlocBuilder<WishlistCubit, WishlistState>(
-        bloc: WishlistCubit(),
         builder: (context, state) {
-          final cubit = WishlistCubit();
+          final cubit = context.read<WishlistCubit>();
           final items = cubit.wishlistItems;
 
           if (items.isEmpty) {

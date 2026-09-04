@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:t_store/core/api/ecommerce_api_client.dart';
 import 'package:t_store/core/utils/helpers/dio_exception_helper.dart';
@@ -9,19 +10,21 @@ import 'package:t_store/features/auth/data/models/change_password_response.dart'
 import 'package:t_store/features/auth/data/models/login_req_body.dart';
 import 'package:t_store/features/auth/data/models/login_response.dart';
 import 'package:t_store/features/auth/data/models/register_req_body.dart';
-import 'package:t_store/features/auth/data/models/register_response.dart';
 import 'package:t_store/features/auth/data/models/send_otp_req_body.dart';
 import 'package:t_store/features/auth/data/models/send_otp_response.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<Either<String, RegisterUserData>> register(
+  Future<Either<String, void>> register(
       {required RegisterReqBody registerReqBody});
-  Future<Either<String, LoginUserData>> login(
+  Future<Either<String, LoginResponse>> login(
       {required LoginReqBody loginReqBody});
   Future<Either<String, SendOtpResponseData>> sendOtp(
       {required SendOtpReqBody forgetPasswordReqBody});
   Future<Either<String, ChangePasswordResponseData>> setNewPassword(
       {required ChangePasswordReqBody changePasswordReqBody});
+  Future<Either<String, void>> verifyEmail(
+      {required String email, required String otp});
+  Future<Either<String, void>> resendOtp({required String email});
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -30,25 +33,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   AuthRemoteDataSourceImpl({required this.apiClient});
 
   @override
-  Future<Either<String, RegisterUserData>> register(
+  Future<Either<String, void>> register(
       {required RegisterReqBody registerReqBody}) async {
     try {
-      var response = await apiClient.dio.post(
-        'https://accessories-eshop.runasp.net/api/register',
+      debugPrint('Registering user with payload: ${registerReqBody.toJson()}');
+      await apiClient.dio.post(
+        '/api/auth/register',
         data: registerReqBody.toJson(),
       );
 
-      RegisterResponse registerResponseModel =
-          RegisterResponse.fromJson(response.data);
-
-      if (registerResponseModel.status) {
-        return Right(registerResponseModel.data!);
-      } else {
-        return Left(registerResponseModel.errorMessage.isNotEmpty
-            ? registerResponseModel.errorMessage
-            : registerResponseModel.errorMessageEn);
-      }
+      return const Right(null);
     } on DioException catch (e) {
+      debugPrint('DioException during register: status=${e.response?.statusCode}, data=${e.response?.data}');
       return Left(e.error?.toString() ?? DioExceptionHelper.handleDioError(e));
     } on PlatformException catch (e) {
       return Left(PlatformExceptionHelper.handlePlatformError(e));
@@ -58,22 +54,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<Either<String, LoginUserData>> login(
+  Future<Either<String, LoginResponse>> login(
       {required LoginReqBody loginReqBody}) async {
     try {
+      debugPrint('Logging in user with payload: ${loginReqBody.toJson()}');
       var response = await apiClient.dio.post(
-        'https://accessories-eshop.runasp.net/api/login',
+        '/api/auth/login',
         data: loginReqBody.toJson(),
       );
 
       LoginResponse loginResponse = LoginResponse.fromJson(response.data);
-
-      if (loginResponse.status) {
-        return Right(loginResponse.data!);
-      } else {
-        return Left(loginResponse.message);
-      }
+      return Right(loginResponse);
     } on DioException catch (e) {
+      debugPrint('DioException during login: status=${e.response?.statusCode}, data=${e.response?.data}');
       return Left(e.error?.toString() ?? DioExceptionHelper.handleDioError(e));
     } on PlatformException catch (e) {
       return Left(PlatformExceptionHelper.handlePlatformError(e));
@@ -87,7 +80,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       {required SendOtpReqBody forgetPasswordReqBody}) async {
     try {
       var response = await apiClient.dio.post(
-        'https://accessories-eshop.runasp.net/api/forget_pass_user',
+        '/api/auth/forgot-password',
         data: forgetPasswordReqBody.toJson(),
       );
       SendOtpResponse forgetPassResponse =
@@ -98,6 +91,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         return Left(forgetPassResponse.message);
       }
     } on DioException catch (e) {
+      debugPrint('DioException during sendOtp: status=${e.response?.statusCode}, data=${e.response?.data}');
       return Left(e.error?.toString() ?? DioExceptionHelper.handleDioError(e));
     } on PlatformException catch (e) {
       return Left(PlatformExceptionHelper.handlePlatformError(e));
@@ -112,7 +106,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       String token = changePasswordReqBody.token;
       var response = await apiClient.dio.post(
-        'https://accessories-eshop.runasp.net/api/change_password',
+        '/api/auth/reset-password',
         data: changePasswordReqBody.toJson(),
         options: Options(
           headers: {
@@ -129,6 +123,48 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         return Left(changePasswordResponse.message);
       }
     } on DioException catch (e) {
+      debugPrint('DioException during setNewPassword: status=${e.response?.statusCode}, data=${e.response?.data}');
+      return Left(e.error?.toString() ?? DioExceptionHelper.handleDioError(e));
+    } on PlatformException catch (e) {
+      return Left(PlatformExceptionHelper.handlePlatformError(e));
+    } catch (e) {
+      return Left('حدث خطأ غير متوقع: $e');
+    }
+  }
+
+  @override
+  Future<Either<String, void>> verifyEmail({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      debugPrint('Verifying email: $email with OTP: $otp');
+      await apiClient.dio.post(
+        '/api/auth/verify-email',
+        data: {'email': email, 'otp': otp},
+      );
+      return const Right(null);
+    } on DioException catch (e) {
+      debugPrint('DioException during verifyEmail: status=${e.response?.statusCode}, data=${e.response?.data}');
+      return Left(e.error?.toString() ?? DioExceptionHelper.handleDioError(e));
+    } on PlatformException catch (e) {
+      return Left(PlatformExceptionHelper.handlePlatformError(e));
+    } catch (e) {
+      return Left('حدث خطأ غير متوقع: $e');
+    }
+  }
+
+  @override
+  Future<Either<String, void>> resendOtp({required String email}) async {
+    try {
+      debugPrint('Resending OTP to email: $email');
+      await apiClient.dio.post(
+        '/api/auth/resend-otp',
+        data: {'email': email},
+      );
+      return const Right(null);
+    } on DioException catch (e) {
+      debugPrint('DioException during resendOtp: status=${e.response?.statusCode}, data=${e.response?.data}');
       return Left(e.error?.toString() ?? DioExceptionHelper.handleDioError(e));
     } on PlatformException catch (e) {
       return Left(PlatformExceptionHelper.handlePlatformError(e));

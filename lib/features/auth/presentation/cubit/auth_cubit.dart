@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:t_store/core/usecases/usecase.dart';
 import 'package:t_store/core/dependency_injection/service_locator.dart';
 import 'package:t_store/core/utils/local_preferences_helper.dart';
+import 'package:t_store/features/auth/domain/repositories/auth_repository.dart';
 import 'package:t_store/features/auth/domain/usecases/sign_in_usecase.dart';
 import 'package:t_store/features/auth/domain/usecases/sign_up_usecase.dart';
 import 'package:t_store/features/auth/domain/usecases/sign_out_usecase.dart';
@@ -15,6 +17,7 @@ class AuthCubit extends Cubit<AuthState> {
   final SignOutUsecase signOutUsecase;
   final ResetPasswordUsecase resetPasswordUsecase;
   final GetCurrentUserUsecase getCurrentUserUsecase;
+  final LocalPreferencesHelper? _preferencesHelper;
 
   AuthCubit({
     required this.signInUsecase,
@@ -22,10 +25,23 @@ class AuthCubit extends Cubit<AuthState> {
     required this.signOutUsecase,
     required this.resetPasswordUsecase,
     required this.getCurrentUserUsecase,
-  }) : super(AuthInitial());
+    LocalPreferencesHelper? preferencesHelper,
+  })  : _preferencesHelper = preferencesHelper ?? _getPreferencesHelperSafely(),
+        super(AuthInitial());
+
+  static LocalPreferencesHelper? _getPreferencesHelperSafely() {
+    try {
+      if (sl.isRegistered<LocalPreferencesHelper>()) {
+        return sl<LocalPreferencesHelper>();
+      }
+      return sl<LocalPreferencesHelper>();
+    } catch (_) {
+      return null;
+    }
+  }
 
   Future<void> checkAuthStatus() async {
-    emit(AuthSubmitLoading());
+    emit(AuthLoading());
 
     final result = await getCurrentUserUsecase(const NoParams());
 
@@ -33,7 +49,7 @@ class AuthCubit extends Cubit<AuthState> {
       (error) => emit(AuthUnauthenticated()),
       (user) {
         if (user != null) {
-          emit(AuthSessionEstablished(user));
+          emit(AuthAuthenticated(user));
         } else {
           emit(AuthUnauthenticated());
         }
@@ -45,7 +61,7 @@ class AuthCubit extends Cubit<AuthState> {
     required String email,
     required String password,
   }) async {
-    emit(AuthSubmitLoading());
+    emit(AuthLoading());
 
     final result = await signInUsecase(SignInParams(
       email: email,
@@ -54,15 +70,15 @@ class AuthCubit extends Cubit<AuthState> {
 
     result.fold(
       (error) {
-        if (error.contains('تأكيد بريدك')) {
+        if (error.contains('تأكيد بريدك') || error.toLowerCase().contains('verify')) {
           emit(AuthEmailConfirmationRequired(email));
         } else {
-          emit(AuthFailure(error));
+          emit(AuthError(error));
         }
       },
       (user) {
-        sl<LocalPreferencesHelper>().setAuthToken(user.id);
-        emit(AuthSessionEstablished(user));
+        _preferencesHelper?.setAuthToken(user.id);
+        emit(AuthAuthenticated(user));
       },
     );
   }
@@ -73,33 +89,79 @@ class AuthCubit extends Cubit<AuthState> {
     required String fullName,
     String? phone,
   }) async {
-    emit(AuthSubmitLoading());
+    debugPrint('AuthCubit.signUp called with email: $email');
+    emit(AuthLoading());
 
-    final result = await signUpUsecase(SignUpParams(
-      email: email,
-      password: password,
-      fullName: fullName,
-      phone: phone,
-    ));
+    try {
+      final result = await signUpUsecase(SignUpParams(
+        email: email,
+        password: password,
+        fullName: fullName,
+        phone: phone,
+      ));
+
+      result.fold(
+        (error) {
+          debugPrint('AuthCubit.signUp failed: $error');
+          emit(AuthError(error));
+        },
+        (user) {
+          debugPrint('AuthCubit.signUp success, confirmation required for email: $email');
+          emit(AuthEmailConfirmationRequired(email));
+        },
+      );
+    } catch (e, s) {
+      debugPrint('AuthCubit.signUp exception: ${e.toString()}');
+      debugPrint('Stack trace: ${s.toString()}');
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> verifyEmail({required String email, required String otp}) async {
+    debugPrint('AuthCubit.verifyEmail called for $email with OTP $otp');
+    emit(AuthLoading());
+
+    final result = await sl<AuthRepository>().verifyEmail(email: email, otp: otp);
 
     result.fold(
-      (error) => emit(AuthFailure(error)),
-      (user) {
-        sl<LocalPreferencesHelper>().setAuthToken(user.id);
-        emit(AuthSessionEstablished(user));
+      (error) {
+        debugPrint('AuthCubit.verifyEmail failed: $error');
+        emit(AuthError(error));
+      },
+      (_) {
+        debugPrint('AuthCubit.verifyEmail success');
+        emit(AuthEmailVerified(email));
+      },
+    );
+  }
+
+  Future<void> resendVerificationEmail(String email) async {
+    debugPrint('AuthCubit.resendVerificationEmail called for $email');
+    emit(AuthLoading());
+
+    final result = await sl<AuthRepository>().resendOtp(email);
+
+    result.fold(
+      (error) {
+        debugPrint('AuthCubit.resendVerificationEmail failed: $error');
+        emit(AuthError(error));
+      },
+      (_) {
+        debugPrint('AuthCubit.resendVerificationEmail success');
+        emit(AuthConfirmationResent(email));
       },
     );
   }
 
   Future<void> signOut() async {
-    emit(AuthSubmitLoading());
+    emit(AuthLoading());
 
     final result = await signOutUsecase(const NoParams());
 
     result.fold(
-      (error) => emit(AuthFailure(error)),
+      (error) => emit(AuthError(error)),
       (_) {
-        sl<LocalPreferencesHelper>().clearAuthToken();
+        _preferencesHelper?.clearAuthToken();
         emit(AuthUnauthenticated());
       },
     );
@@ -117,7 +179,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   void clearError() {
-    if (state is AuthError) {
+    if (state is AuthError || state is AuthFailure) {
       emit(AuthUnauthenticated());
     }
   }

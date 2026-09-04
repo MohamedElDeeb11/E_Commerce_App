@@ -14,7 +14,7 @@ class DioExceptionHelper {
       case DioExceptionType.cancel:
         return "تم إلغاء الطلب. حاول مرة أخرى.";
       case DioExceptionType.unknown:
-        return dioException.message!.contains("SocketException")
+        return dioException.message != null && dioException.message!.contains("SocketException")
             ? "يبدو أنك غير متصل بالإنترنت. تحقق من الاتصال."
             : "حدث خطأ غير متوقع. حاول مرة أخرى.";
       default:
@@ -24,6 +24,37 @@ class DioExceptionHelper {
 
   static String _handleBadResponse(Response? response) {
     if (response != null) {
+      final data = response.data;
+      if (data != null) {
+        if (data is Map<String, dynamic>) {
+          if (data.containsKey('detail') && data['detail'] != null) {
+            return data['detail'].toString();
+          }
+          if (data.containsKey('message') && data['message'] != null) {
+            return data['message'].toString();
+          }
+          if (data.containsKey('errors') && data['errors'] is Map) {
+            final errorsMap = data['errors'] as Map;
+            final errorMessages = <String>[];
+            errorsMap.forEach((key, value) {
+              if (value is List) {
+                errorMessages.addAll(value.map((e) => e.toString()));
+              } else if (value != null) {
+                errorMessages.add(value.toString());
+              }
+            });
+            if (errorMessages.isNotEmpty) {
+              return errorMessages.join('\n');
+            }
+          }
+          if (data.containsKey('title') && data['title'] != null) {
+            return data['title'].toString();
+          }
+        } else if (data is String && data.isNotEmpty) {
+          return data;
+        }
+      }
+
       switch (response.statusCode) {
         case 400:
           return "طلب غير صحيح. تحقق من المدخلات.";

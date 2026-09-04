@@ -20,8 +20,8 @@ class AuthRepoImpl implements AuthRepo {
         .register(registerReqBody: registerReqBody);
     return result.fold(
       (error) => Left(error),
-      (userData) async {
-        return Right(userData);
+      (_) async {
+        return Right(RegisterUserData());
       },
     );
   }
